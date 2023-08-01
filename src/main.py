@@ -1,6 +1,5 @@
 import sys
 import time
-import stock
 from stock import Stock
 from models import Model
 
