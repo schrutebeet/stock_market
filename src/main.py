@@ -1,12 +1,8 @@
+import sys
 import time
 import stock
 from stock import Stock
 from models import Model
-import sys
-from pathlib import Path
-api_dir = str(Path(stock.__file__).parent.parent.parent / "keys")
-sys.path.append(api_dir)
-from auth import api_key
 
 def timeit(func):
     @staticmethod
@@ -35,7 +31,7 @@ class Runner():
 def main():
     arguments = sys.argv
     try:
-        for arg in  arguments[1:]:
+        for arg in arguments[1:]:
             stock = Stock(arg)
             Runner.run(stock, scale=True)
     except Exception as err:
