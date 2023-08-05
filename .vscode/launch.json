@@ -2,12 +2,22 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Program pre-running",
+            "name": "Run testing",
+            "type": "python",
+            "request": "launch",
+            "program": "/home/schrute_beet/Github/stock_market/utils/log_config.py",
+            "python": "/home/schrute_beet/Github/venvs/stock_venv/bin/python",
+            "env": {
+                "PYTHONPATH": "/home/schrute_beet/Github/stock_market/"
+            }
+        },
+
+        {
+            "name": "Run main",
             "type": "python",
             "request": "launch",
             "program": "/home/schrute_beet/Github/stock_market/src/main.py",
             "python": "/home/schrute_beet/Github/venvs/stock_venv/bin/python",
-            "args": ["AAPL", "MSFT", "UBSG"],
             "env": {
                 "PYTHONPATH": "/home/schrute_beet/Github/stock_market/"
             }
