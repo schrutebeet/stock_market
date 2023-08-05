@@ -1,7 +1,10 @@
 import sys
 import time
+import logging
+from utils import log_config
 from stock import Stock
-from models import Model
+from src.models import Model
+from scrape_industries import IndustriesScraper
 
 def timeit(func):
     @staticmethod
@@ -10,33 +13,37 @@ def timeit(func):
         # runs the function
         function = func(*args, **kwargs)
         end = time.time()
-        print("-"*25)
+        print("\n","-"*30, sep="")
         print(f'Elapsed time: {(end - start):.2f} seconds')
-        print("-"*25, "\n")
+        print("-"*30, "\n")
         return function
     return wrapper
 
 class Runner():
     @timeit
-    def run(stock, fetch_type='fetch_daily', train_size=0.8, rolling_window=60, scale=True):
-        print(f'\n-------Running framework for {stock.stock_symbol}-------\n')
-        getattr(stock, fetch_type)()
-        stock.prepare_train_test_sets(train_size, rolling_window, scale=scale)
-        base_for_model = Model(stock)
-        if not base_for_model.stock_inst.data.empty:
-            base_for_model.lstm_nn(viz=True)
-
+    def run(fetch_type='fetch_daily', train_size=0.8, rolling_window=60, scale=True):
+        try:
+            logging.info(f"Initializing web scraper")
+            ind_scraper = IndustriesScraper('https://stockanalysis.com/stocks/')
+            scraped_tb = ind_scraper.run_scraper()
+        except:
+            return 1
+        for symbol in scraped_tb.symbol[4:]:
+            try:
+                stock = Stock(symbol)
+                print(f'\n-------Running framework for {symbol}-------\n')
+                getattr(stock, fetch_type)()
+                stock.prepare_train_test_sets(train_size, rolling_window, scale=scale)
+                base_for_model = Model(stock)
+                base_for_model.lstm_nn(viz=False)
+                logging.info(f"Successfully run framework for symbol {symbol}")
+            except Exception as e:
+                print(e)
+                print(f'Process aborted for symbol {symbol}')
+                pass
 
 def main():
-    arguments = sys.argv
-    try:
-        for arg in arguments[1:]:
-            stock = Stock(arg)
-            Runner.run(stock, scale=True)
-    except Exception as err:
-        comment = "Please, add a stock symbol argument when running the framework."
-        err_message = f"{type(err).__name__}: {str(err)}. {comment}"
-        raise Exception(f"{err_message}")
-
+    Runner.run()
+    
 if __name__ == '__main__':
     main()
