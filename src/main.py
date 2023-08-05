@@ -29,7 +29,7 @@ class Runner():
             scraped_tb = ind_scraper.run_scraper()
         except:
             return 1
-        for symbol in scraped_tb.symbol[4:]:
+        for symbol in scraped_tb.symbol[:]:
             try:
                 stock = Stock(symbol)
                 getattr(stock, fetch_type)()
