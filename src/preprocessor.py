@@ -48,12 +48,3 @@ def prepare_train_test_sets(df, train_size, rolling_window):
         x_test = np.vstack((x_test, test_data[i-rolling_window: i, 0]))
 
     x_test = np.reshape(x_test, (x_test.shape[0], x_test.shape[1], 1))
-    if __name__ == "__main__":
-        print(x_train.shape)
-        print(y_train.shape)
-        print(x_test.shape)
-        print(y_test.shape)
-
-
-df = Stock('AAPL').fetch_daily()
-prepare_train_test_sets(df, 0.8, 60)

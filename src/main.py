@@ -31,7 +31,6 @@ class Runner():
         for symbol in scraped_tb.symbol[4:]:
             try:
                 stock = Stock(symbol)
-                print(f'\n-------Running framework for {symbol}-------\n')
                 getattr(stock, fetch_type)()
                 stock.prepare_train_test_sets(train_size, rolling_window, scale=scale)
                 base_for_model = Model(stock)
