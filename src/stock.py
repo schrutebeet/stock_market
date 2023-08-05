@@ -3,16 +3,13 @@ OBJECTIVE OF THIS MODULE
 ------------------------
 Define funtions for fetching data from AlphaVantage API
 """
+import logging
 import pandas as pd
 import requests
 import numpy as np
+from dependencies.authenticator import api_key
 from sklearn.preprocessing import MinMaxScaler
-import stock
-import sys
-from pathlib import Path
-api_dir = str(Path(stock.__file__).parent.parent.parent / "keys")
-sys.path.append(api_dir)
-from auth import api_key
+import utils.error_handling as errors
 
 class Stock:
     
@@ -50,7 +47,9 @@ class Stock:
             df = df[df.index <= end_date]
 
         df.columns = ['open', 'high', 'low', 'close', 'volume']
-        self.data = df
+        if df.empty:
+            logging.error('AlphaVantage: returns an empty Dataframe.')
+            raise errors.EmptyDataframeError()
 
     def fetch_daily(self, start_date=None, end_date=None) -> None:
         """
@@ -70,13 +69,13 @@ class Stock:
         try:
             r = requests.get(url)
         except requests.exceptions.ConnectionError as e:
-            print('WARNING: COULD NOT CONNECT TO THE INTERNET')
-            return None
+            logging.error('AlphaVantage: Could not connect to the internet')
+            raise e
         try:
             json_data = r.json()['Time Series (Daily)']
-        except KeyError as err:
-            print(f'WARNING: NO DATA FOUND FOR TICKER {self.stock_symbol}')
-            return None
+        except KeyError as e:
+            logging.error('AlphaVantage: JSON does not have a "Time Series (Daily)" key.')
+            raise e
         df = pd.DataFrame(json_data).T.sort_index()
         df.index = pd.to_datetime(df.index)
         df = df.apply(pd.to_numeric, errors='coerce')
@@ -87,6 +86,9 @@ class Stock:
             end_date = pd.to_datetime(end_date)
             df = df[df.index <= end_date]
         df.columns = ['open', 'high', 'low', 'non_adj_close', 'close', 'volume', 'dividend_amount', 'split_coeff']
+        if df.empty:
+                logging.error('AlphaVantage: returns an empty Dataframe.')
+                raise errors.EmptyDataframeError(self.stock_symbol)
         self.data = df
         
     def _treat_missing_data(self) -> pd.DataFrame:
@@ -121,25 +123,22 @@ class Stock:
         self.train_size = train_size
         self.rolling_window = rolling_window
         if not 0 < train_size < 1:
-            raise ValueError("Argument 'train_size' must be a value between 0 and 1")
+            logging.error("Argument 'train_size' must be a value between 0 and 1.")
+            raise ValueError()
         if not rolling_window > 0:
-            raise ValueError("Argument 'rolling_window' must be higher than 0")
+            logging.error("Argument 'train_size' must be higher than 0.")
+            raise ValueError()
         df = self._treat_missing_data()
-        try:
-            close_prices = df['close'].to_numpy()
-        except KeyError:
-            print('No "close" column found. Dataframe is probably empty. See warnings above.')
-            return None
+        close_prices = df['close'].to_numpy()
         # We start with the train set
         training_data_len = int(round(len(close_prices)* train_size, 0))
+        if training_data_len < rolling_window:
+            logging.error('Preprocess: training data size cannot be smaller than rolling window size.')
+            raise errors.TrainingLengthError(training_data_len, rolling_window)
         train_data = close_prices[0: training_data_len].reshape(-1,1)
         if scale:
             scaler = MinMaxScaler()
             train_data = scaler.fit_transform(train_data)
-            train_data = scaler.fit_transform(train_data)
-            
-            train_data = scaler.fit_transform(train_data)   
-            
         x_train = np.empty((0, rolling_window))
         y_train = train_data[rolling_window: , 0]
         for i in range(rolling_window, len(train_data)):
