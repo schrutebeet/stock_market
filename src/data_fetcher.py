@@ -3,7 +3,7 @@ OBJECTIVE OF THIS MODULE
 ------------------------
 Define funtions for fetching data from AlphaVantage API
 """
-from dependencies import auth
+from dependencies import authenticator
 import pandas as pd
 import requests
 
@@ -11,7 +11,7 @@ class Stock:
     
     def __init__(self, stock_symbol):
         self.stock_symbol = stock_symbol
-        self.api_key = auth.api_key
+        self.api_key = authenticator.api_key
 
     def fetch_intraday(self, start_date=None, end_date=None):
         """
