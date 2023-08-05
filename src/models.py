@@ -17,7 +17,10 @@ class Model:
         model.add(keras.layers.Dense(1))
         print(model.summary())
         model.compile(optimizer='adam', loss='mean_squared_error')
-        model.fit(self.stock_inst.x_train, self.stock_inst.y_train, batch_size=50, epochs=3)
+        model.fit(self.stock_inst.x_train, 
+                  self.stock_inst.y_train, 
+                  batch_size=min(50, len(self.stock_inst.x_train)), 
+                  epochs=3)
         self.scaler_preds = model.predict(self.stock_inst.x_test)
         if self.stock_inst.scaler:
             self.real_preds = self.stock_inst.scaler.inverse_transform(self.scaler_preds)
