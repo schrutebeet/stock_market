@@ -23,6 +23,7 @@ class Runner():
     @timeit
     def run(fetch_type='fetch_daily', train_size=0.8, rolling_window=60, scale=True):
         try:
+            log_config.add_separator()
             logging.info(f"Initializing web scraper")
             ind_scraper = IndustriesScraper('https://stockanalysis.com/stocks/')
             scraped_tb = ind_scraper.run_scraper()

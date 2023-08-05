@@ -9,6 +9,10 @@ os.makedirs(log_folder, exist_ok=True)
 
 log_file = os.path.join(log_folder, 'stock_market_logs.txt')
 
+def add_separator():
+    separator = '-' * 40  # Customize the separator line as you like
+    logging.info(separator)
+
 # Configuring the 'logging' file
 logging.basicConfig(
     filename=log_file,
