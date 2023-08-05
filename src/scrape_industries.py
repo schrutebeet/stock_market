@@ -56,7 +56,7 @@ class IndustriesScraper:
             driver = webdriver.Chrome(options=chrome_options)
         except selenium.common.exceptions.WebDriverException as e:
             logging.error(f"Web scraper could not be carried out because "\
-                          "there is no internat connection or there is no driver installed.")
+                          "there is no internet connection or there is no driver installed.")
             raise errors.InternetError()
         driver.set_window_size(1366, 768)
         driver.get(self.url)
