@@ -38,8 +38,7 @@ class Runner():
                 base_for_model.lstm_nn(viz=False)
                 logging.info(f"Successfully run framework for symbol {symbol}")
             except Exception as e:
-                print(e)
-                print(f'Process aborted for symbol {symbol}')
+                logging.error(f'Process aborted for symbol {symbol}')
                 pass
 
 def main():

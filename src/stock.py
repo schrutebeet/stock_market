@@ -48,7 +48,7 @@ class Stock:
 
         df.columns = ['open', 'high', 'low', 'close', 'volume']
         if df.empty:
-            logging.error('AlphaVantage: returns an empty Dataframe.')
+            logging.warning('AlphaVantage: returns an empty Dataframe.')
             raise errors.EmptyDataframeError()
 
     def fetch_daily(self, start_date=None, end_date=None) -> None:
@@ -69,12 +69,12 @@ class Stock:
         try:
             r = requests.get(url)
         except requests.exceptions.ConnectionError as e:
-            logging.error('AlphaVantage: Could not connect to the internet')
+            logging.error(f'AlphaVantage: Could not fetch info for {self.stock_symbol} due to no internet connectivity')
             raise e
         try:
             json_data = r.json()['Time Series (Daily)']
         except KeyError as e:
-            logging.error('AlphaVantage: JSON does not have a "Time Series (Daily)" key.')
+            logging.warning('AlphaVantage: JSON does not have a "Time Series (Daily)" key.')
             raise e
         df = pd.DataFrame(json_data).T.sort_index()
         df.index = pd.to_datetime(df.index)
@@ -87,7 +87,7 @@ class Stock:
             df = df[df.index <= end_date]
         df.columns = ['open', 'high', 'low', 'non_adj_close', 'close', 'volume', 'dividend_amount', 'split_coeff']
         if df.empty:
-                logging.error('AlphaVantage: returns an empty Dataframe.')
+                logging.warning('AlphaVantage: returns an empty Dataframe.')
                 raise errors.EmptyDataframeError(self.stock_symbol)
         self.data = df
         
@@ -133,7 +133,7 @@ class Stock:
         # We start with the train set
         training_data_len = int(round(len(close_prices)* train_size, 0))
         if training_data_len < rolling_window:
-            logging.error('Preprocess: training data size cannot be smaller than rolling window size.')
+            logging.warning('Preprocess: training data size cannot be smaller than rolling window size.')
             raise errors.TrainingLengthError(training_data_len, rolling_window)
         train_data = close_prices[0: training_data_len].reshape(-1,1)
         if scale:
