@@ -44,9 +44,6 @@ class Model:
         plt.plot(train)
         plt.plot(test[['close', 'preds']])
         plt.legend(['Train', 'Val', 'Predictions'], loc='lower right')
-        image_path = 'opt/lstm_plot.png'
-        plt.savefig(image_path)
-        plt.close()
         image_path = f'opt/{self.stock_inst.stock_symbol}_lstm_plot.png'
         plt.savefig(image_path)
         plt.close()
