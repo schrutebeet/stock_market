@@ -18,7 +18,20 @@ class Stock:
         self.api_key = api_key
         self.data = pd.DataFrame()
 
-    def fetch_intraday(self, start_date=None, end_date=None) -> pd.DataFrame:
+    @staticmethod
+    def transform_json_to_df(json_data, start_date, end_date):
+        df = pd.DataFrame(json_data).T.sort_index()
+        df.index = pd.to_datetime(df.index)
+        df = df.apply(pd.to_numeric, errors='coerce')
+        if start_date is not None:
+            start_date = pd.to_datetime(f'{start_date} 00:00:00')
+            df = df[df.index >= start_date]
+        if end_date is not None:
+            end_date = pd.to_datetime(f'{end_date} 23:59:59')
+            df = df[df.index <= end_date]
+        return df
+
+    def fetch_intraday(self, start_date=None, end_date=None) -> None:
         """
         Fetch intraday data for a particular stock instance.
 
@@ -35,21 +48,12 @@ class Stock:
               f'&symbol={self.stock_symbol}&outputsize=full&interval=1min&apikey={self.api_key}'
         r = requests.get(url)
         json_data = r.json()['Time Series (1min)']
-        df = pd.DataFrame(json_data).T.sort_index()
-        df.index = pd.to_datetime(df.index)
-        df = df.apply(pd.to_numeric, errors='coerce')
-
-        if start_date is not None:
-            start_date = pd.to_datetime(f'{start_date} 00:00:00')
-            df = df[df.index >= start_date]
-        if end_date is not None:
-            end_date = pd.to_datetime(f'{end_date} 23:59:59')
-            df = df[df.index <= end_date]
-
+        df = self.transform_json_to_df(json_data, start_date, end_date)
         df.columns = ['open', 'high', 'low', 'close', 'volume']
         if df.empty:
             logging.warning('AlphaVantage: returns an empty Dataframe.')
             raise errors.EmptyDataframeError()
+        self.data = df
 
     def fetch_daily(self, start_date=None, end_date=None) -> None:
         """
@@ -76,15 +80,7 @@ class Stock:
         except KeyError as e:
             logging.warning('AlphaVantage: JSON does not have a "Time Series (Daily)" key.')
             raise e
-        df = pd.DataFrame(json_data).T.sort_index()
-        df.index = pd.to_datetime(df.index)
-        df = df.apply(pd.to_numeric, errors='coerce')
-        if start_date is not None:
-            start_date = pd.to_datetime(start_date)
-            df = df[df.index >= start_date]
-        if end_date is not None:
-            end_date = pd.to_datetime(end_date)
-            df = df[df.index <= end_date]
+        df = self.transform_json_to_df(json_data, start_date, end_date)
         df.columns = ['open', 'high', 'low', 'non_adj_close', 'close', 'volume', 'dividend_amount', 'split_coeff']
         if df.empty:
                 logging.warning('AlphaVantage: returns an empty Dataframe.')
