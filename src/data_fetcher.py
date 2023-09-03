@@ -3,9 +3,10 @@ OBJECTIVE OF THIS MODULE
 ------------------------
 Define funtions for fetching data from AlphaVantage API
 """
-from dependencies import authenticator
 import pandas as pd
 import requests
+
+from dependencies import authenticator
 
 
 class Stock:

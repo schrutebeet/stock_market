@@ -1,28 +1,29 @@
 """
 PACKAGES
 """
-import io
-import sys
 import csv
-import time
-import stock
-import random
+import datetime
+import io
 import logging
-import datetime
-import requests
-import datetime
-import pandas as pd
-import utils.error_handling as errors
-from dependencies.authenticator import api_key
-from bs4 import BeautifulSoup
+import random
+import sys
+import time
 from urllib.request import Request, urlopen
+
+import pandas as pd
+import requests
 import selenium
+from bs4 import BeautifulSoup
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
-from webdriver_manager.chrome import ChromeDriverManager
-from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.ui import WebDriverWait
+from webdriver_manager.chrome import ChromeDriverManager
+
+import stock
+import utils.error_handling as errors
+from dependencies.authenticator import api_key
 
 """
 VARIABLES

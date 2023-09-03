@@ -1,10 +1,11 @@
+import logging
 import sys
 import time
-import logging
+
 import utils.log_config as log_config
-from stock import Stock
-from src.models import Model
 from scrape_industries import IndustriesScraper
+from src.models import Model
+from stock import Stock
 
 
 def timeit(func):

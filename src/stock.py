@@ -4,12 +4,14 @@ OBJECTIVE OF THIS MODULE
 Define funtions for fetching data from AlphaVantage API
 """
 import logging
+
+import numpy as np
 import pandas as pd
 import requests
-import numpy as np
-from dependencies.authenticator import api_key
 from sklearn.preprocessing import MinMaxScaler
+
 import utils.error_handling as errors
+from dependencies.authenticator import api_key
 
 
 class Stock:

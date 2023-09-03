@@ -3,11 +3,13 @@ OBJECTIVE OF THIS MODULE
 ------------------------
 Module to preprocess and clean the fetched data.
 """
-from data_fetcher import Stock
-import pandas as pd
 import math
+
 import numpy as np
+import pandas as pd
 from sklearn.preprocessing import MinMaxScaler
+
+from data_fetcher import Stock
 
 
 def treat_missing_data(df):
