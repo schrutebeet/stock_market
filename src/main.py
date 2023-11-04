@@ -3,9 +3,9 @@ import sys
 import time
 
 import utils.log_config as log_config
-from scrape_industries import IndustriesScraper
+from src.scrape_industries import IndustriesScraper
 from src.models import Model
-from stock import Stock
+from src.stock import Stock
 
 
 def timeit(func):
