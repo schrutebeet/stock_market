@@ -12,7 +12,7 @@ with open(key_dir / "postgres_keys.yaml", 'r') as f:
             credentials = yaml.safe_load(f)
 
 class Settings:
-    PROJECT_NAME: str = "My first connection"
+    PROJECT_NAME: str = "Stocks"
     PROJECT_VERSION: str = "0.0.1"
 
     POSTGRES_USER: str = credentials["user"]
