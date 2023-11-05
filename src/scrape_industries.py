@@ -21,6 +21,7 @@ from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.common.keys import Keys
 from webdriver_manager.chrome import ChromeDriverManager
 
 import utils.error_handling as errors
@@ -56,7 +57,6 @@ class IndustriesScraper:
         #chrome_options.add_argument("--headless")
         try:
             driver = webdriver.Chrome(options=chrome_options)
-            print(type(driver))
         except selenium.common.exceptions.WebDriverException as e:
             logging.error(
                 f"Web scraper could not be carried out because "
@@ -65,16 +65,29 @@ class IndustriesScraper:
             raise errors.InternetError()
         driver.set_window_size(1366, 768)
         driver.get(self.url)
-        # Consent cookies
-        WebDriverWait(driver, 30).until(
-            EC.element_to_be_clickable(
-                (By.CSS_SELECTOR, "button.fc-button.fc-cta-consent.fc-primary-button")
-            )
-        ).click()
-        # Dismiss newsletter banner
-        WebDriverWait(driver, 60).until(
-            EC.element_to_be_clickable((By.XPATH, "//button[@aria-label='Close']"))
-        ).click()
+        try:
+            # Consent cookies
+            WebDriverWait(driver, 30).until(
+                EC.element_to_be_clickable(
+                    (By.CSS_SELECTOR, "button.fc-button.fc-cta-consent.fc-primary-button")
+                )
+            ).click()
+        except Exception as e:
+            logging.info("Cookies banner was not found")
+            print(f"{e}")
+        try:
+            # Dismiss newsletter banner
+            WebDriverWait(driver, 40).until(
+                EC.element_to_be_clickable((By.CSS_SELECTOR, "[class*='Close'], [class*='close']"))
+            ).click()
+            # in case the close driver does not work
+            element = driver.switch_to.active_element
+            element.send_keys(Keys.ESCAPE)
+        except Exception as e:
+            logging.info("Newsletter banner was not found")
+            print(f"{e}")
+
+        # Proceed with scraping
         num_pages = 0
         while True:
             try:
