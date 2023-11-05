@@ -2,24 +2,24 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Run testing",
+            "name": "IOS/LINUX: Run main",
             "type": "python",
             "request": "launch",
-            "program": "/home/schrute_beet/Github/stock_market/utils/log_config.py",
-            "python": "/home/schrute_beet/Github/venvs/stock_venv/bin/python",
+            "program": "${workspaceFolder}/src/main.py",
+            "python": "${workspaceFolder}/stock_venv/bin/python",
             "env": {
-                "PYTHONPATH": "/home/schrute_beet/Github/stock_market/"
+                "PYTHONPATH": "${workspaceFolder}"
             }
         },
 
         {
-            "name": "Run main",
+            "name": "WINDOWS: Run main",
             "type": "python",
             "request": "launch",
-            "program": "/home/schrute_beet/Github/stock_market/src/main.py",
-            "python": "/home/schrute_beet/Github/venvs/stock_venv/bin/python",
+            "program": "${workspaceFolder}\\src\\main.py",
+            "python": "${workspaceFolder}\\stock_venv\\Scripts\\python.exe",
             "env": {
-                "PYTHONPATH": "/home/schrute_beet/Github/stock_market/"
+                "PYTHONPATH": "${workspaceFolder}"
             }
         }
     ]
