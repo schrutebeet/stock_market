@@ -22,6 +22,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.keys import Keys
+import utils.log_config as log_config
 from webdriver_manager.chrome import ChromeDriverManager
 
 import utils.error_handling as errors
@@ -114,6 +115,7 @@ class IndustriesScraper:
                     logging.info(
                         f"Successfully web-scraped {num_pages} pages and saved {len(info['symbol'])} symbols."
                     )
+                    log_config.add_separator()
                     break
                 else:
                     logging.error(
