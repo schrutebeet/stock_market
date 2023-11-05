@@ -39,9 +39,10 @@ class Model:
         else:
             self.real_preds = self.scaler_preds
         rmse = np.sqrt(np.mean(self.real_preds - self.stock_inst.y_test) ** 2)
-        self._binary_pred()
+        accuracy = self._binary_pred()
         if viz:
             self._viz_predictions()
+        return accuracy
 
     def _viz_predictions(self):
         data = self.stock_inst.data[["close"]]
@@ -78,6 +79,7 @@ class Model:
         print(
             f"\n\nAccuracy of the {self.model_name} model: {accuracy*100:.2f}%, from {total_iters} iterations\n"
         )
+        return accuracy
 
     @staticmethod
     def _XNOR(a, b):
