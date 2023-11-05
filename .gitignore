@@ -1,2 +1,3 @@
 stock_venv/
 *.pyc
+__pycache__/
