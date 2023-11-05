@@ -12,8 +12,8 @@ __DATABASE_URL = f"postgresql://{settings.POSTGRES_USER}:"\
 
 # used to create a database engine
 # the engine manages the database connection.
-# The echo=True argument is optional and is often used for debugging purposes
-engine = create_engine(__DATABASE_URL, echo=True)
+# The echo=True argument is optional and is often used for debugging purposes (turned off)
+engine = create_engine(__DATABASE_URL)
 
 # used to create a models (tables) based on an object-oriented approach
 Base = declarative_base()
