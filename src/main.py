@@ -3,8 +3,8 @@ import sys
 import time
 
 import utils.log_config as log_config
-from src.scrape_industries import IndustriesScraper
 from src.models import Model
+from src.scrape_industries import IndustriesScraper
 from src.stock import Stock
 
 

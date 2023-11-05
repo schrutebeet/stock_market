@@ -8,24 +8,24 @@ import logging
 import random
 import sys
 import time
-from urllib.request import Request, urlopen
 from pathlib import Path
+from urllib.request import Request, urlopen
 
 import pandas as pd
 import requests
 import selenium
 from bs4 import BeautifulSoup
-from config.config import Config
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.common.keys import Keys
-import utils.log_config as log_config
 from webdriver_manager.chrome import ChromeDriverManager
 
 import utils.error_handling as errors
+import utils.log_config as log_config
+from config.config import Config
 from dependencies.authenticator import api_key
 
 """
