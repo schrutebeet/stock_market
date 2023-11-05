@@ -79,16 +79,12 @@ class Stock:
         try:
             r = requests.get(url)
         except requests.exceptions.ConnectionError as e:
-            logging.error(
-                f"AlphaVantage: Could not fetch info for {self.stock_symbol} due to no internet connectivity"
-            )
+            logging.error(f"AlphaVantage: Could not fetch info for {self.stock_symbol} due to no internet connectivity")
             raise e
         try:
             json_data = r.json()["Time Series (Daily)"]
         except KeyError as e:
-            logging.warning(
-                'AlphaVantage: JSON does not have a "Time Series (Daily)" key.'
-            )
+            logging.warning('AlphaVantage: JSON does not have a "Time Series (Daily)" key.')
             raise e
         df = self.transform_json_to_df(json_data, start_date, end_date)
         df.columns = [
@@ -148,9 +144,7 @@ class Stock:
         # We start with the train set
         training_data_len = int(round(len(close_prices) * train_size, 0))
         if training_data_len < rolling_window:
-            logging.warning(
-                "Preprocess: training data size cannot be smaller than rolling window size."
-            )
+            logging.warning("Preprocess: training data size cannot be smaller than rolling window size.")
             raise errors.TrainingLengthError(training_data_len, rolling_window)
         train_data = close_prices[0:training_data_len].reshape(-1, 1)
         if scale:

@@ -33,9 +33,7 @@ class Model:
         )
         self.scaler_preds = model.predict(self.stock_inst.x_test)
         if self.stock_inst.scaler:
-            self.real_preds = self.stock_inst.scaler.inverse_transform(
-                self.scaler_preds
-            )
+            self.real_preds = self.stock_inst.scaler.inverse_transform(self.scaler_preds)
         else:
             self.real_preds = self.scaler_preds
         rmse = np.sqrt(np.mean(self.real_preds - self.stock_inst.y_test) ** 2)
@@ -76,9 +74,7 @@ class Model:
             hit = self._XNOR(choice, realization)
             hit_list.append(hit)
         accuracy = sum(hit_list) / len(hit_list)
-        print(
-            f"\n\nAccuracy of the {self.model_name} model: {accuracy*100:.2f}%, from {total_iters} iterations\n"
-        )
+        print(f"\n\nAccuracy of the {self.model_name} model: {accuracy*100:.2f}%, from {total_iters} iterations\n")
         return accuracy
 
     @staticmethod

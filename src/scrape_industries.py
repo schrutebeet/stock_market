@@ -70,7 +70,10 @@ class IndustriesScraper:
             # Consent cookies
             WebDriverWait(driver, 30).until(
                 EC.element_to_be_clickable(
-                    (By.CSS_SELECTOR, "button.fc-button.fc-cta-consent.fc-primary-button")
+                    (
+                        By.CSS_SELECTOR,
+                        "button.fc-button.fc-cta-consent.fc-primary-button",
+                    )
                 )
             ).click()
         except Exception as e:
@@ -104,23 +107,17 @@ class IndustriesScraper:
                     info["industry"].append(row[2])
                     info["market_cap"].append(row[3])
                 WebDriverWait(driver, 10).until(
-                    EC.element_to_be_clickable(
-                        (By.XPATH, "//button[contains(., 'Next')]")
-                    )
+                    EC.element_to_be_clickable((By.XPATH, "//button[contains(., 'Next')]"))
                 ).click()
                 time.sleep(random.choice([2, 3]))
                 num_pages += 1
             except selenium.common.exceptions.TimeoutException as e:
                 if num_pages > 0:
-                    logging.info(
-                        f"Successfully web-scraped {num_pages} pages and saved {len(info['symbol'])} symbols."
-                    )
+                    logging.info(f"Successfully web-scraped {num_pages} pages and saved {len(info['symbol'])} symbols.")
                     log_config.add_separator()
                     break
                 else:
-                    logging.error(
-                        f"Scraped zero pages. Check on the selenium code and update if necessary."
-                    )
+                    logging.error(f"Scraped zero pages. Check on the selenium code and update if necessary.")
                     return None
         self.web_data = pd.DataFrame(info)
         driver.quit()
@@ -152,12 +149,8 @@ class IndustriesScraper:
     def table_unions(self):
         stockanalysis = self.web_data
         alpha = self.alpha_data
-        df_merge = pd.merge(
-            stockanalysis, alpha, on="symbol", how="outer"
-        ).drop_duplicates()
-        df_merge["company_name"] = df_merge.name.combine_first(
-            df_merge.company
-        )  # Coalesce
+        df_merge = pd.merge(stockanalysis, alpha, on="symbol", how="outer").drop_duplicates()
+        df_merge["company_name"] = df_merge.name.combine_first(df_merge.company)  # Coalesce
         df_merge = df_merge[
             [
                 "symbol",
