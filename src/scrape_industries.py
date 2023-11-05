@@ -9,11 +9,13 @@ import random
 import sys
 import time
 from urllib.request import Request, urlopen
+from pathlib import Path
 
 import pandas as pd
 import requests
 import selenium
 from bs4 import BeautifulSoup
+from config.config import Config
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
@@ -45,12 +47,16 @@ class IndustriesScraper:
 
     def extraction(self) -> None:
         info = {"symbol": [], "company": [], "industry": [], "market_cap": []}
-        chromedriver_path = "/home/schrute_beet/Github/drivers/chrome-linux64/chrome"
+        chromedriver_path = str(Path(Config.chromedriver_path))
         chrome_options = webdriver.ChromeOptions()
-        chrome_options.binary_location = chromedriver_path
-        chrome_options.add_argument("--headless")
+        try:
+            chrome_options.binary_location = chromedriver_path
+        except:
+            logging.error("Incorrect ChromeDriver path. Check on the config file.")
+        #chrome_options.add_argument("--headless")
         try:
             driver = webdriver.Chrome(options=chrome_options)
+            print(type(driver))
         except selenium.common.exceptions.WebDriverException as e:
             logging.error(
                 f"Web scraper could not be carried out because "
