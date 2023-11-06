@@ -6,23 +6,20 @@ import datetime
 import io
 import logging
 import random
-import sys
 import time
+from typing import List, Union
 from pathlib import Path
-from urllib.request import Request, urlopen
 
 import pandas as pd
+import math
 import requests
 import selenium
 from bs4 import BeautifulSoup
 from selenium import webdriver
-from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
-from webdriver_manager.chrome import ChromeDriverManager
-from sqlalchemy.sql import text
 
 import utils.error_handling as errors
 import utils.log_config as log_config
@@ -49,7 +46,7 @@ class IndustriesScraper:
         self.extraction()
         self.alpha_stocks()
         self.table_unions()
-        self.insert_tables_in_db()
+        self.insert_tables_in_db(50_000)
         return self.joint_table
 
     def extraction(self) -> None:
@@ -158,7 +155,7 @@ class IndustriesScraper:
     def table_unions(self):
         stockanalysis = self.web_data
         alpha = self.alpha_data[self.alpha_data['assettype'] == "Stock"].copy()
-        df_merge = pd.merge(stockanalysis, alpha, on="symbol", how="outer").drop_duplicates()
+        df_merge = pd.merge(stockanalysis, alpha, on="symbol", how="outer").drop_duplicates().reset_index(drop=True)
         df_merge["companyname"] = df_merge.name.combine_first(df_merge.company)  # Coalesce
         df_merge = df_merge[
             [
@@ -175,7 +172,7 @@ class IndustriesScraper:
         df_merge['timestamp'] = datetime.datetime.utcnow()
         self.joint_table = df_merge
 
-    def insert_tables_in_db(self):
+    def insert_tables_in_db(self, batch_size: int = 100_000):
         """Insert values of each extracted table in the DB."""
         info_wrapper = [(self.web_data, "stock_industries"), 
                         (self.alpha_data, "stock_info"), 
@@ -186,25 +183,32 @@ class IndustriesScraper:
         # Check whether any new tables should be created
         utils.create_new_models()
         for tuple_ in info_wrapper:
-            #print(tuple_[0][~pd.notna(tuple_[0]['timestamp'])])
+            len_df = len(tuple_[0])
             model = utils.get_class_with_table_name(tuple_[1])
-            """
-            values_placeholder = ["%s"] * len(tuple_[0].columns)
-            column_names = tuple_[0].columns.tolist()
-            insert_query = f"INSERT INTO {tuple_[1]} ({', '.join(column_names)}) VALUES ({', '.join(values_placeholder)})"
-            """
-            df_in_tuples = tuple_[0].apply(tuple, axis=1)
-            data = [dict(zip(tuple_[0].columns, row)) for row in df_in_tuples]
-
-            for row in data:
-                new_row_obj = model(**row)
-                self.dbsession.add(new_row_obj)
-            
+            if len_df > batch_size:
+                output_df = self.divide_df_in_batches(tuple_[0], batch_size)
+            else:
+                output_df = [tuple_[0]]
+            for df in output_df:
+                # argument "orient='records'" especifies the dictionary should be made row-wise
+                dictionary_rows = df.to_dict(orient='records')
+                self.dbsession.bulk_insert_mappings(model, dictionary_rows)
             # Commit the changes to the database for each model
             self.dbsession.commit()
         # Close connection
         self.dbsession.close()
 
+    @staticmethod
+    def divide_df_in_batches(input_df: pd.DataFrame, batch_size: int) -> Union[pd.DataFrame, List[pd.DataFrame]]:
+        n_chunks = math.ceil(len(input_df) / batch_size)
+        output_df = []
+        starting_row, ending_row = 0, batch_size
+        for n in range(n_chunks):
+            chunked_df = input_df.iloc[starting_row : ending_row, ]
+            output_df.append(chunked_df)
+            starting_row += batch_size
+            ending_row += batch_size
+        return output_df
 
 """
 EXECUTION
