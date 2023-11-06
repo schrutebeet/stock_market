@@ -172,7 +172,7 @@ class IndustriesScraper:
         df_merge['timestamp'] = datetime.datetime.utcnow()
         self.joint_table = df_merge
 
-    def insert_tables_in_db(self, batch_size: int = 100_000):
+    def insert_tables_in_db(self, batch_size: int = 100_000) -> None:
         """Insert values of each extracted table in the DB."""
         info_wrapper = [(self.web_data, "stock_industries"), 
                         (self.alpha_data, "stock_info"), 
