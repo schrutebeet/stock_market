@@ -10,7 +10,7 @@ from dependencies import authenticator
 from utils.error_handling import ValueOutOfBoundsException
 
 
-class StocksExtractor:
+class CryptoExtractor:
     """Extract rates from the AlphaVantage API."""
 
     ACCEPTABLE_PERIODS = ["1min", "5min", "15min", "30min", "60min", "1min", "daily"]
