@@ -74,7 +74,7 @@ class StocksExtractor(BaseExtractor):
 
         return df
 
-    def __choose_function_type(self, period: str, month: str = datetime.now().strftime("%Y-%m")) -> Dict[str, str]:
+    def __choose_function_type(self, period: str, month: str) -> Dict[str, str]:
         """Decide wich endpoint to trigger depending on the period category.
 
         Args:
@@ -86,10 +86,9 @@ class StocksExtractor(BaseExtractor):
             Dict[str, str]: JSON file containing OHLCV information from the API.
         """
         if period != "daily":
-            present_month = datetime.now().strftime("%Y-%m")
             url = (
                 f"https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol="
-                f"{self.symbol}&month={present_month}&interval={period}&apikey={self.api_key}"
+                f"{self.symbol}&month={month}&interval={period}&apikey={self.api_key}"
             )
             r = requests.get(url)
             json_data = r.json()[f"Time Series {period}"]
@@ -102,3 +101,4 @@ class StocksExtractor(BaseExtractor):
             json_data = r.json()["Time Series (Daily)"]
 
             return json_data
+
