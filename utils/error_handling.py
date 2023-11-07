@@ -14,3 +14,6 @@ class InternetError(Exception):
         message = ("Connectivity error. Either machine is not "\
                    "connected to the internet or no driver is installed.")
         super().__init__(message)
+
+class ValueOutOfBoundsException(Exception):
+    pass

@@ -9,14 +9,10 @@ import numpy as np
 import pandas as pd
 from sklearn.preprocessing import MinMaxScaler
 
-from data_fetcher import Stock
-
-
 def treat_missing_data(df):
     # If a value is missing, fill it with the previous value
     df = df.fillna(method="ffill")
     return df
-
 
 def prepare_train_test_sets(df, train_size, rolling_window):
     if not 0 < train_size < 1:
