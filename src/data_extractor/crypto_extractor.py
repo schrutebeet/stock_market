@@ -6,7 +6,6 @@ import pandas as pd
 import requests
 from dateutil.relativedelta import relativedelta
 
-from dependencies import authenticator
 from src.data_extractor.base_extractor import BaseExtractor
 from utils.error_handling import ValueOutOfBoundsException
 
@@ -14,19 +13,25 @@ from utils.error_handling import ValueOutOfBoundsException
 class CryptoExtractor(BaseExtractor):
     """Extract crypto rates from the AlphaVantage API."""
 
-    ACCEPTABLE_PERIODS = ["1min", "5min", "15min", "30min", "60min", "1min", "daily"]
+    ACCEPTABLE_PERIODS = ["1min", "5min", "15min", "30min", "60min", "daily"]
 
     def __init__(self, symbol: str, api_key: Any, function: str):
         super().__init__(symbol, api_key, function)
 
-    def get_stock_data(self, period: str = "daily", full_data: bool = False) -> pd.DataFrame:
-        """Get the stock data from the API for a specified symbol.
+    def get_data(self, 
+                 period: str = "daily", 
+                 from_date: str = datetime.now().strftime("%Y-%m-%d"), 
+                 until_date: str = datetime.now().strftime("%Y-%m-%d")) -> pd.DataFrame:
+        """Get the crypto data from the API for a specified symbol.
 
         Args:
             period (str, optional): Defines the window size for each new quote. Defaults to "daily".
-            full_data (bool, optional): If set to True, provides full data since the year 2000. 
-                                        Otherwise, it provides data only for the current month. 
-                                        Defaults to False.
+            from_date (str, optional): Date from where to start fetching data. Only accepts '%Y-m-%d'
+                                       string formats. Defaults to datetime.now().strftime("%Y-%m-%d")
+                                       (today).
+            until_date (str, optional): Date from where to end fetching data. Only accepts '%Y-m-%d'
+                                        string formats. Defaults to datetime.now().strftime("%Y-%m-%d")
+                                        (today).
 
         Raises:
             ValueOutOfBoundsException: Raises exception if the 'period' argument is not within the 
@@ -41,21 +46,46 @@ class CryptoExtractor(BaseExtractor):
                                             {', '.join(self.ACCEPTABLE_PERIODS)}"
             )
 
-        if full_data:
-            json_rates = {}
-            start_date = datetime(2000, 1, 1)
-            current_date = datetime.now()
-            current_month = start_date
-            while current_month <= current_date:
-                month_str = current_month.strftime("%Y-%m")
-                new_data = self.__choose_function_type(period, month_str)
-                json_rates.update(new_data)
-                logging.info(
-                    f"Extracting months from {start_date.strftime('%Y-%m')}" f"until {current_date.strftime('%Y-%m')}"
-                )
-                current_month += relativedelta(months=1)
-        else:
-            json_rates = self.__choose_function_type(period)
+    def get_data(self, 
+                 period: str = "daily", 
+                 from_date: str = datetime.now().strftime("%Y-%m-%d"), 
+                 until_date: str = datetime.now().strftime("%Y-%m-%d")) -> pd.DataFrame:
+        """Get the crypto data from the API for a specified symbol.
+
+        Args:
+            period (str, optional): Defines the window size for each new quote. Defaults to "daily".
+            from_date (str, optional): Date from where to start fetching data. Only accepts '%Y-m-%d'
+                                       string formats. Defaults to datetime.now().strftime("%Y-%m-%d")
+                                       (today).
+            until_date (str, optional): Date from where to end fetching data. Only accepts '%Y-m-%d'
+                                        string formats. Defaults to datetime.now().strftime("%Y-%m-%d")
+                                        (today).
+
+        Raises:
+            ValueOutOfBoundsException: Raises exception if the 'period' argument is not within the 
+                                       default values from the 'ACCEPTABLE_PERIODS' class attribute.
+
+        Returns:
+            pd.DataFrame: Returns DataFrame containing OHLCV information.
+        """
+        if period not in self.ACCEPTABLE_PERIODS:
+            raise ValueOutOfBoundsException(
+                f"Argument 'period' must be one of these categories: \
+                                            {', '.join(self.ACCEPTABLE_PERIODS)}"
+            )
+
+        json_rates = {}
+        current_date = datetime.now()
+        current_month = from_date
+        while current_month <= until_date:
+            month_datetime = datetime.strptime(current_month, "%Y-%m-%d")
+            month_str = month_datetime.strftime("%Y-%m")
+            new_data = self.__choose_function_type(period, month_str)
+            json_rates.update(new_data)
+            logging.info(
+                f"Extracting stock information for {month_str}"
+            )
+            current_month += relativedelta(months=1)
 
         df = pd.DataFrame(json_rates).T
         if period != "daily":
@@ -64,6 +94,11 @@ class CryptoExtractor(BaseExtractor):
             df.columns = ["open","high", "low", "close", "adj_close", 
                           "volume", "dividend_amount", "split_coeff"]
         df.index = pd.to_datetime(df.index)
+
+        # Apply specific daydate filters
+        start_date = pd.to_datetime(f"{from_date} 00:00:00")
+        end_date = pd.to_datetime(f"{until_date} 23:59:59")
+        df = df[(df.index >= start_date) & (df.index <= end_date)]
 
         return df
 
