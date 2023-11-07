@@ -1,6 +1,6 @@
 import logging
 from datetime import datetime
-from typing import Dict
+from typing import Dict, Any
 
 import pandas as pd
 import requests
@@ -10,15 +10,13 @@ from dependencies import authenticator
 from utils.error_handling import ValueOutOfBoundsException
 
 
-class StocksExtractor:
+class StocksExtractor(BaseExtractor):
     """Extract rates from the AlphaVantage API."""
 
     ACCEPTABLE_PERIODS = ["1min", "5min", "15min", "30min", "60min", "1min", "daily"]
 
-    def __init__(self, symbol: str, function: str):
-        self.symbol = symbol
-        self.api_key = authenticator.api_key
-        self.function = function.upper()
+    def __init__(self, symbol: str, api_key: Any, function: str):
+        super().__init__(symbol, api_key, function)
 
     def get_stock_data(self, period: str = "daily", full_data: bool = False) -> pd.DataFrame:
         """Get the stock data from the API for a specified symbol.
