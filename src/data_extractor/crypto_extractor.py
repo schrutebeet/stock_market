@@ -15,9 +15,9 @@ class CryptoExtractor(BaseExtractor):
 
     ACCEPTABLE_PERIODS = ["1min", "5min", "15min", "30min", "60min", "daily"]
 
-    def __init__(self, symbol: str, api_key: Any, function: str):
-        super().__init__(symbol, api_key, function)
-        self.currency = "USD"
+    def __init__(self, symbol: str, api_key: Any, currency: str):
+        super().__init__(symbol, api_key)
+        self.currency = currency
 
     def get_data(self, 
                  period: str = "daily", 
@@ -43,16 +43,15 @@ class CryptoExtractor(BaseExtractor):
         """
         if period not in self.ACCEPTABLE_PERIODS:
             raise ValueOutOfBoundsException(
-                f"Argument 'period' must be one of these categories: \
-                                            {', '.join(self.ACCEPTABLE_PERIODS)}"
+                f"Argument 'period' must be one of these categories: " \
+                                            f"{', '.join(self.ACCEPTABLE_PERIODS)}"
             )
 
         json_rates = {}
         current_date = datetime.now()
-        current_month = from_date
-        while current_month <= until_date:
-            month_datetime = datetime.strptime(current_month, "%Y-%m-%d")
-            month_str = month_datetime.strftime("%Y-%m")
+        current_month = datetime.strptime(from_date, "%Y-%m-%d")
+        while current_month <= datetime.strptime(until_date, "%Y-%m-%d"):
+            month_str = current_month.strftime("%Y-%m")
             new_data = self.__choose_function_type(period, month_str)
             json_rates.update(new_data)
             logging.info(
@@ -81,8 +80,8 @@ class CryptoExtractor(BaseExtractor):
                 "3b. low (USD)": "low_USD",
                 f"4a. close ({self.currency})": f"close_{self.currency}",
                 "4b. close (USD)": "close_USD",
-                f"5a. volume ({self.currency})": f"volume_{self.currency}",
-                "5b. volume (USD)": "volume_USD",
+                f"5. volume": f"volume",
+                f"6. market cap (USD)": f"market_cap_USD",
             }
             df = df.rename(columns=renamed_cols)
         df.index = pd.to_datetime(df.index)
@@ -90,7 +89,9 @@ class CryptoExtractor(BaseExtractor):
         # Apply specific daydate filters
         start_date = pd.to_datetime(f"{from_date} 00:00:00")
         end_date = pd.to_datetime(f"{until_date} 23:59:59")
+        print(df)
         df = df[(df.index >= start_date) & (df.index <= end_date)]
+        df['SYMBOL'] = self.symbol
 
         return df
 
@@ -108,17 +109,17 @@ class CryptoExtractor(BaseExtractor):
         if period != "daily":
             url = (
                 f"https://www.alphavantage.co/query?function=CRYPTO_INTRADAY&symbol="\
-                f"{self.symbol}&market={self.self.currency}&interval={period}&outputsize=full"\
+                f"{self.symbol}&market={self.currency}&interval={period}&outputsize=full"\
                 f"&apikey={self.api_key}"
             )
             r = requests.get(url)
-            json_data = r.json()[f"Time Series Crypto {period}"]
+            json_data = r.json()[f"Time Series Crypto ({period})"]
         else:
             url = (
                 f"https://www.alphavantage.co/query?function=DIGITAL_CURRENCY_DAILY&symbol="\
-                f"{self.symbol}&interval={period}&apikey={self.api_key}"
+                f"{self.symbol}&market={self.currency}&apikey={self.api_key}"
             )
             r = requests.get(url)
             json_data = r.json()["Time Series (Digital Currency Daily)"]
 
-            return json_data
+        return json_data
