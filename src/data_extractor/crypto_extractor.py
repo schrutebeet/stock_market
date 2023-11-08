@@ -18,6 +18,7 @@ class CryptoExtractor(BaseExtractor):
     def __init__(self, symbol: str, api_key: Any, currency: str):
         super().__init__(symbol, api_key)
         self.currency = currency
+        self.url = None
 
     def get_data(self, 
                  period: str = "daily", 
@@ -107,19 +108,19 @@ class CryptoExtractor(BaseExtractor):
             Dict[str, str]: JSON file containing OHLCV information from the API.
         """
         if period != "daily":
-            url = (
+            self.url = (
                 f"https://www.alphavantage.co/query?function=CRYPTO_INTRADAY&symbol="\
                 f"{self.symbol}&market={self.currency}&interval={period}&outputsize=full"\
                 f"&apikey={self.api_key}"
             )
-            r = requests.get(url)
+            r = requests.get(self.url)
             json_data = r.json()[f"Time Series Crypto ({period})"]
         else:
-            url = (
+            self.url = (
                 f"https://www.alphavantage.co/query?function=DIGITAL_CURRENCY_DAILY&symbol="\
                 f"{self.symbol}&market={self.currency}&apikey={self.api_key}"
             )
-            r = requests.get(url)
+            r = requests.get(self.url)
             json_data = r.json()["Time Series (Digital Currency Daily)"]
 
         return json_data
