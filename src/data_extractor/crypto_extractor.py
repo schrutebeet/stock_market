@@ -17,34 +17,7 @@ class CryptoExtractor(BaseExtractor):
 
     def __init__(self, symbol: str, api_key: Any, function: str):
         super().__init__(symbol, api_key, function)
-
-    def get_data(self, 
-                 period: str = "daily", 
-                 from_date: str = datetime.now().strftime("%Y-%m-%d"), 
-                 until_date: str = datetime.now().strftime("%Y-%m-%d")) -> pd.DataFrame:
-        """Get the crypto data from the API for a specified symbol.
-
-        Args:
-            period (str, optional): Defines the window size for each new quote. Defaults to "daily".
-            from_date (str, optional): Date from where to start fetching data. Only accepts '%Y-m-%d'
-                                       string formats. Defaults to datetime.now().strftime("%Y-%m-%d")
-                                       (today).
-            until_date (str, optional): Date from where to end fetching data. Only accepts '%Y-m-%d'
-                                        string formats. Defaults to datetime.now().strftime("%Y-%m-%d")
-                                        (today).
-
-        Raises:
-            ValueOutOfBoundsException: Raises exception if the 'period' argument is not within the 
-                                       default values from the 'ACCEPTABLE_PERIODS' class attribute.
-
-        Returns:
-            pd.DataFrame: Returns DataFrame containing OHLCV information.
-        """
-        if period not in self.ACCEPTABLE_PERIODS:
-            raise ValueOutOfBoundsException(
-                f"Argument 'period' must be one of these categories: \
-                                            {', '.join(self.ACCEPTABLE_PERIODS)}"
-            )
+        self.currency = "USD"
 
     def get_data(self, 
                  period: str = "daily", 
@@ -89,10 +62,29 @@ class CryptoExtractor(BaseExtractor):
 
         df = pd.DataFrame(json_rates).T
         if period != "daily":
-            df.columns = ["open", "high", "low", "close", "volume"]
+            renamed_cols = {
+                "1. open": "open",
+                "2. high": "high",
+                "3. low": "low",
+                "4. close": "close",
+                "5. volume": "volume",
+            }
+            df = df.rename(columns=renamed_cols)
+            df['currency'] = self.currency
         else:
-            df.columns = ["open","high", "low", "close", "adj_close", 
-                          "volume", "dividend_amount", "split_coeff"]
+            renamed_cols = {
+                f"1a. open ({self.currency})": f"open_{self.currency}",
+                "1b. open (USD)": "open_USD",
+                f"2a. high ({self.currency})": f"high_{self.currency}",
+                "2b. high (USD)": "high_USD",
+                f"3a. low ({self.currency})": f"low_{self.currency}",
+                "3b. low (USD)": "low_USD",
+                f"4a. close ({self.currency})": f"close_{self.currency}",
+                "4b. close (USD)": "close_USD",
+                f"5a. volume ({self.currency})": f"volume_{self.currency}",
+                "5b. volume (USD)": "volume_USD",
+            }
+            df = df.rename(columns=renamed_cols)
         df.index = pd.to_datetime(df.index)
 
         # Apply specific daydate filters
@@ -115,17 +107,18 @@ class CryptoExtractor(BaseExtractor):
         """
         if period != "daily":
             url = (
-                f"https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol="
-                f"{self.symbol}&month={month}&interval={period}&apikey={self.api_key}"
+                f"https://www.alphavantage.co/query?function=CRYPTO_INTRADAY&symbol="\
+                f"{self.symbol}&market={self.self.currency}&interval={period}&outputsize=full"\
+                f"&apikey={self.api_key}"
             )
             r = requests.get(url)
-            json_data = r.json()[f"Time Series {period}"]
+            json_data = r.json()[f"Time Series Crypto {period}"]
         else:
             url = (
-                f"https://www.alphavantage.co/query?function=TIME_SERIES_DAILY_ADJUSTED&symbol="
+                f"https://www.alphavantage.co/query?function=DIGITAL_CURRENCY_DAILY&symbol="\
                 f"{self.symbol}&interval={period}&apikey={self.api_key}"
             )
             r = requests.get(url)
-            json_data = r.json()["Time Series (Daily)"]
+            json_data = r.json()["Time Series (Digital Currency Daily)"]
 
             return json_data
