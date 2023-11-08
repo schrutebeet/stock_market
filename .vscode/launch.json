@@ -5,7 +5,7 @@
             "name": "IOS/LINUX: Run main",
             "type": "python",
             "request": "launch",
-            "program": "${workspaceFolder}/src/main.py",
+            "program": "${file}",
             "python": "${workspaceFolder}/stock_venv/bin/python",
             "env": {
                 "PYTHONPATH": "${workspaceFolder}"
@@ -16,7 +16,7 @@
             "name": "WINDOWS: Run main",
             "type": "python",
             "request": "launch",
-            "program": "${workspaceFolder}\\src\\main.py",
+            "program": "${file}",
             "python": "${workspaceFolder}\\stock_venv\\Scripts\\python.exe",
             "env": {
                 "PYTHONPATH": "${workspaceFolder}"
