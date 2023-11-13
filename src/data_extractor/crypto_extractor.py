@@ -7,7 +7,7 @@ import requests
 from dateutil.relativedelta import relativedelta
 
 from src.data_extractor.base_extractor import BaseExtractor
-from utils.error_handling import ValueOutOfBoundsException
+from utils.error_handling import ValueOutOfBoundsException, APIError
 
 
 class CryptoExtractor(BaseExtractor):
@@ -15,8 +15,8 @@ class CryptoExtractor(BaseExtractor):
 
     ACCEPTABLE_PERIODS = ["1min", "5min", "15min", "30min", "60min", "daily"]
 
-    def __init__(self, symbol: str, api_key: Any, currency: str):
-        super().__init__(symbol, api_key)
+    def __init__(self, symbol: str, currency: str):
+        super().__init__(symbol)
         self.currency = currency
         self.url = None
 
@@ -43,10 +43,9 @@ class CryptoExtractor(BaseExtractor):
             pd.DataFrame: Returns DataFrame containing OHLCV information.
         """
         if period not in self.ACCEPTABLE_PERIODS:
-            raise ValueOutOfBoundsException(
-                f"Argument 'period' must be one of these categories: " \
-                                            f"{', '.join(self.ACCEPTABLE_PERIODS)}"
-            )
+            logging.error(f"Argument 'period' must be one of these categories: " \
+                                            f"{', '.join(self.ACCEPTABLE_PERIODS)}")
+            raise ValueOutOfBoundsException
 
         json_rates = {}
         current_date = datetime.now()
@@ -59,7 +58,7 @@ class CryptoExtractor(BaseExtractor):
                 f"Extracting stock information for {month_str}"
             )
             current_month += relativedelta(months=1)
-
+        print(str(json_rates)[:4000])
         df = pd.DataFrame(json_rates).T
         if period != "daily":
             renamed_cols = {
@@ -90,7 +89,6 @@ class CryptoExtractor(BaseExtractor):
         # Apply specific daydate filters
         start_date = pd.to_datetime(f"{from_date} 00:00:00")
         end_date = pd.to_datetime(f"{until_date} 23:59:59")
-        print(df)
         df = df[(df.index >= start_date) & (df.index <= end_date)]
         df['SYMBOL'] = self.symbol
 
@@ -113,14 +111,49 @@ class CryptoExtractor(BaseExtractor):
                 f"{self.symbol}&market={self.currency}&interval={period}&outputsize=full"\
                 f"&apikey={self.api_key}"
             )
-            r = requests.get(self.url)
-            json_data = r.json()[f"Time Series Crypto ({period})"]
+            response = self.__return_request(self.url)
+            json_data = response[f"Time Series Crypto ({period})"]
         else:
             self.url = (
                 f"https://www.alphavantage.co/query?function=DIGITAL_CURRENCY_DAILY&symbol="\
                 f"{self.symbol}&market={self.currency}&apikey={self.api_key}"
             )
-            r = requests.get(self.url)
-            json_data = r.json()["Time Series (Digital Currency Daily)"]
+            response = self.__return_request(self.url)
+            json_data = response["Time Series (Digital Currency Daily)"]
 
         return json_data
+        
+    @staticmethod
+    def __return_request(url: str) -> dict:
+        """_summary_
+
+        Args:
+            url (str): Endpoint url for the API call.
+
+        Raises:
+            APIError: Raise custom error if any problem arises within the API. 
+
+        Returns:
+            dict: Returns a dictionary with the stated characteristics.
+        """
+        try:
+            r = requests.get(url)
+            r_json = r.json()
+            if len(r_json) == 0:
+                logging.error(f"API response returned an empty dictionary")
+                raise APIError
+            
+            potential_error_message = list(r_json.keys())[0]
+            potential_error_explanation = list(r_json.values())[0]
+            if potential_error_message.lower() == "error message":
+                logging.error(f"{potential_error_explanation}")
+                raise APIError
+
+        except requests.exceptions.RequestException:
+            logging.error(f"Could not connect with AlphaVantage API. Please, "\
+                           "make sure you are connected to the internet")
+    
+        return r_json
+
+
+print(CryptoExtractor(symbol="ETH", currency="USD").get_data(period="daily"))
