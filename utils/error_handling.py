@@ -16,4 +16,12 @@ class InternetError(Exception):
         super().__init__(message)
 
 class ValueOutOfBoundsException(Exception):
-    pass
+    def __init__(self):
+        message = ("Argument 'period' out of bounds. Check accepted values.")
+        super().__init__(message)
+
+class APIError(Exception):
+    def __init__(self):
+        message = ("Successfully connected to AlphaVantage API, but an error ocurred anyway.\n"\
+                   "Please, check logger for more information.")
+        super().__init__(message)
