@@ -4,7 +4,7 @@ import logs
 import os
 
 
-log_folder = Path(logs.__file__).parent
+log_folder = Path(__file__).parent.parent / "logs"
 os.makedirs(log_folder, exist_ok=True)
 
 log_file = os.path.join(log_folder, 'stock_market_logs.txt')
