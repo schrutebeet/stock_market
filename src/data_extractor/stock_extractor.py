@@ -51,7 +51,6 @@ class StocksExtractor(BaseExtractor):
         current_month = datetime.strptime(from_date, "%Y-%m-%d")
         while current_month <= datetime.strptime(until_date, "%Y-%m-%d"):
             month_str = current_month.strftime("%Y-%m")
-            print(month_str)
             new_data = self.__choose_function_type(period, month_str)
             json_list.append(new_data)
             logging.info(
@@ -70,7 +69,6 @@ class StocksExtractor(BaseExtractor):
         # Apply specific daydate filters
         start_date = pd.to_datetime(f"{from_date} 00:00:00")
         end_date = pd.to_datetime(f"{until_date} 23:59:59")
-        print(df)
         df = df[(df.index >= start_date) & (df.index <= end_date)]
 
         return df
