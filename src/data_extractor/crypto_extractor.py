@@ -1,7 +1,6 @@
 import logging
 from datetime import datetime
-from typing import Dict, Any
-import pytz
+from typing import Dict
 
 import pandas as pd
 import requests
