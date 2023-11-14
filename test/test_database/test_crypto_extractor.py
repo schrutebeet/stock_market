@@ -17,29 +17,29 @@ class TestCryptoExtractor(unittest.TestCase):
         "Time Series (Digital Currency Daily)": {
             "2023-11-10": 
             {
-                "1a. open (USD)": "35399.13000000",
-                "1b. open (USD)": "35399.13000000",
-                "2a. high (USD)": "35419.29000000",
-                "2b. high (USD)": "35419.29000000",
-                "3a. low (USD)": "35250.00000000",
-                "3b. low (USD)": "35250.00000000",
-                "4a. close (USD)": "35419.29000000",
-                "4b. close (USD)": "35419.29000000",
-                "5. volume": "1520.60543000",
-                "6. market cap (USD)": "1520.60543000"
+                "1a. open (CHF)": "33441.48193380",
+                "1b. open (USD)": "37064.13000000",
+                "2a. high (CHF)": "33760.75565740",
+                "2b. high (USD)": "37417.99000000",
+                "3a. low (CHF)": "32781.81258000",
+                "3b. low (USD)": "36333.00000000",
+                "4a. close (CHF)": "32899.04322180",
+                "4b. close (USD)": "36462.93000000",
+                "5. volume": "32798.18252000",
+                "6. market cap (USD)": "32798.18252000"
             },
             "2023-11-09": 
             {
-                "1a. open (USD)": "35046.09000000",
-                "1b. open (USD)": "35046.09000000",
-                "2a. high (USD)": "35888.00000000",
-                "2b. high (USD)": "35888.00000000",
-                "3a. low (USD)": "34523.06000000",
-                "3b. low (USD)": "34523.06000000",
-                "4a. close (USD)": "35399.12000000",
-                "4b. close (USD)": "35399.12000000",
-                "5. volume": "38688.73692000",
-                "6. market cap (USD)": "38688.73692000"
+                "1a. open (CHF)": "32899.04322180",
+                "1b. open (USD)": "36462.93000000",
+                "2a. high (CHF)": "33112.94200000",
+                "2b. high (USD)": "36700.00000000",
+                "3a. low (CHF)": "32652.94278420",
+                "3b. low (USD)": "36190.17000000",
+                "4a. close (CHF)": "33051.25448380",
+                "4b. close (USD)": "36631.63000000",
+                "5. volume": "6614.68037000",
+                "6. market cap (USD)": "6614.68037000"
             },
         }
     }
@@ -62,17 +62,18 @@ class TestCryptoExtractor(unittest.TestCase):
             },
         }
     }
-    expected_bitcoin_daily = pd.DataFrame(data={"open_BTC": [35046.09000000], 
-                                                "open_USD": [35046.09000000], 
-                                                "high_BTC": [1890.50000],
-                                                "high_USD": [1890.50000],
-                                                "low_BTC": [1889.90000],
-                                                "low_USD": [1889.90000],
-                                                "close_BTC": [1890.49000],
-                                                "close_USD": [1890.49000],
-                                                "volume_BTC": [1234],
-                                                "volume_USD": [1234]},
-                                                index=[pd.to_datetime("2023-11-09 22:40:00")],
+    expected_bitcoin_daily = pd.DataFrame(data={"open_CHF": [33441.48193380], 
+                                                "open_USD": [37064.13000000], 
+                                                "high_CHF": [33760.75565740],
+                                                "high_USD": [37417.99000000],
+                                                "low_CHF": [32781.81258000],
+                                                "low_USD": [36333.00000000],
+                                                "close_CHF": [32899.04322180],
+                                                "close_USD": [36462.93000000],
+                                                "volume": [32798.18252000],
+                                                "market_cap_USD": [32798.18252000],
+                                                 "symbol": ["BTC"],},
+                                                index=[pd.to_datetime("2023-11-10")],
                                                 )
     expected_ethereum_5mins = pd.DataFrame(data={"open": [1889.90000], 
                                                  "high": [1890.50000],
@@ -86,6 +87,13 @@ class TestCryptoExtractor(unittest.TestCase):
     
     @patch("src.data_extractor.crypto_extractor.CryptoExtractor._CryptoExtractor__return_request")
     def test_daily_extraction(self, mocked_response):
+        mocked_response.return_value = self.input_bitcoin_daily
+        bitcoin_extr = CryptoExtractor(symbol="BTC", currency="CHF")
+        output = bitcoin_extr.get_data(period="daily", from_date='2023-11-10', until_date='2023-11-10')
+        assert_frame_equal(output, self.expected_bitcoin_daily)
+
+    @patch("src.data_extractor.crypto_extractor.CryptoExtractor._CryptoExtractor__return_request")
+    def test_minute_extraction(self, mocked_response):
         mocked_response.return_value = self.input_ethereum_5mins
         ethereum_extr = CryptoExtractor(symbol="ETH", currency="EUR")
         output = ethereum_extr.get_data(period="5min", from_date='2023-11-09', until_date='2023-11-09')
