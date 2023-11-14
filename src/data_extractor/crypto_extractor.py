@@ -91,6 +91,7 @@ class CryptoExtractor(BaseExtractor):
         end_date = pd.to_datetime(f"{until_date} 23:59:59")
         df = df[(df.index >= start_date) & (df.index <= end_date)]
         df = df.apply(pd.to_numeric, errors='ignore')
+        df = df.fillna(method="ffill")
         df['symbol'] = self.symbol
 
         return df
