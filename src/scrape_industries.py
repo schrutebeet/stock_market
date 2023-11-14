@@ -43,6 +43,12 @@ class IndustriesScraper:
         self.dbsession = SessionLocal()
 
     def run_scraper(self) -> pd.DataFrame:
+        """Run all methods sequentially to get the joint results of all scrapings.
+
+        Returns:
+            pd.DataFrame: Dataframe containing information on different assets, as well as 
+                          their industry group.
+        """
         self.extraction()
         self.alpha_stocks()
         self.table_unions()
@@ -50,6 +56,11 @@ class IndustriesScraper:
         return self.joint_table
 
     def extraction(self) -> None:
+        """Scrape information on industry and market capitalization for the vast majority of US stocks.
+
+        Raises:
+            errors.InternetError: Raise error if no internet connection is found.
+        """
         info = {"symbol": [], "company": [], "industry": [], "marketcap": []}
         chromedriver_path = str(Path(Config.chromedriver_path))
         chrome_options = webdriver.ChromeOptions()
@@ -126,7 +137,13 @@ class IndustriesScraper:
         self.web_data = web_data
         driver.quit()
 
-    def alpha_stocks(self, day=datetime.date.today()) -> None:
+    def alpha_stocks(self, day: datetime.datetime=datetime.date.today()) -> None:
+        """Get stocks' general information from the AlphaVantage API.
+
+        Args:
+            day (datetime.datetime, optional): Set the day for information on that specific time. 
+                                               Defaults to datetime.date.today().
+        """
         CSV_URL = f"https://www.alphavantage.co/query?function=LISTING_STATUS&date={day}&state=active&apikey={api_key}"
         with requests.Session() as s:
             download = s.get(CSV_URL)
@@ -153,6 +170,8 @@ class IndustriesScraper:
             self.alpha_data = df
 
     def table_unions(self):
+        """Unite tables from both data sources.
+        """
         stockanalysis = self.web_data
         alpha = self.alpha_data[self.alpha_data['assettype'] == "Stock"].copy()
         df_merge = pd.merge(stockanalysis, alpha, on="symbol", how="outer").drop_duplicates().reset_index(drop=True)
@@ -186,7 +205,7 @@ class IndustriesScraper:
             len_df = len(tuple_[0])
             model = utils.get_class_with_table_name(tuple_[1])
             if len_df > batch_size:
-                output_df = self.divide_df_in_batches(tuple_[0], batch_size)
+                output_df = self._divide_df_in_batches(tuple_[0], batch_size)
             else:
                 output_df = [tuple_[0]]
             for df in output_df:
@@ -199,7 +218,9 @@ class IndustriesScraper:
         self.dbsession.close()
 
     @staticmethod
-    def divide_df_in_batches(input_df: pd.DataFrame, batch_size: int) -> Union[pd.DataFrame, List[pd.DataFrame]]:
+    def _divide_df_in_batches(input_df: pd.DataFrame, batch_size: int) -> Union[pd.DataFrame, List[pd.DataFrame]]:
+        """Divide dataframe in smaller pieces for speed improvement.
+        """
         n_chunks = math.ceil(len(input_df) / batch_size)
         output_df = []
         starting_row, ending_row = 0, batch_size
