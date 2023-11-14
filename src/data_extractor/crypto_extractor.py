@@ -58,7 +58,6 @@ class CryptoExtractor(BaseExtractor):
                 f"Extracting stock information for {month_str}"
             )
             current_month += relativedelta(months=1)
-        print(str(json_rates)[:4000])
         df = pd.DataFrame(json_rates).T
         if period != "daily":
             renamed_cols = {
@@ -90,7 +89,8 @@ class CryptoExtractor(BaseExtractor):
         start_date = pd.to_datetime(f"{from_date} 00:00:00")
         end_date = pd.to_datetime(f"{until_date} 23:59:59")
         df = df[(df.index >= start_date) & (df.index <= end_date)]
-        df['SYMBOL'] = self.symbol
+        df = df.apply(pd.to_numeric, errors='ignore')
+        df['symbol'] = self.symbol
 
         return df
 
@@ -156,4 +156,3 @@ class CryptoExtractor(BaseExtractor):
         return r_json
 
 
-print(CryptoExtractor(symbol="ETH", currency="USD").get_data(period="daily"))
