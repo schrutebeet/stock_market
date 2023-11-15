@@ -16,7 +16,8 @@ class CryptoExtractor(BaseExtractor):
     ACCEPTABLE_PERIODS = ["1min", "5min", "15min", "30min", "60min", "daily"]
 
     def __init__(self, symbol: str, currency: str):
-        super().__init__(symbol)
+        super().__init__()
+        self.symbol = symbol
         self.currency = currency
         self.url = None
 

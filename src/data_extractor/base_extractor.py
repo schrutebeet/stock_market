@@ -7,8 +7,7 @@ from typing import Any
 class BaseExtractor:
     """Set requirements for child 'XYZExtractor' classes.
     """
-    def __init__(self, symbol: str):
-        self.symbol = symbol
+    def __init__(self):
         self.api_key = authenticator.api_key
 
     @abstractmethod

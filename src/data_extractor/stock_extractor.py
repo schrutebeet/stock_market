@@ -16,7 +16,8 @@ class StocksExtractor(BaseExtractor):
     ACCEPTABLE_PERIODS = ["1min", "5min", "15min", "30min", "60min", "daily"]
 
     def __init__(self, symbol: str, api_key: Any):
-        super().__init__(symbol, api_key)
+        super().__init__(api_key)
+        self.symbol = symbol
 
     def get_data(self, 
                  period: str = "daily", 
