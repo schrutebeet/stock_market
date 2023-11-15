@@ -71,7 +71,6 @@ class StocksExtractor(BaseExtractor):
                 "5. volume": "volume",
             }
             df = df.rename(columns=renamed_cols)
-            df['currency'] = self.currency
         df.index = pd.to_datetime(df.index)
 
         # Apply specific daydate filters
