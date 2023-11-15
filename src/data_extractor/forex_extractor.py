@@ -2,7 +2,6 @@ import logging
 from datetime import datetime
 from typing import Dict
 
-import utils.log_config as log_config
 import pandas as pd
 import requests
 from dateutil.relativedelta import relativedelta
@@ -34,7 +33,7 @@ class ForexExtractor(BaseExtractor):
                  period: str = "daily", 
                  from_date: str = datetime.now().strftime("%Y-%m-%d"), 
                  until_date: str = datetime.now().strftime("%Y-%m-%d")) -> pd.DataFrame:
-        """Get the crypto data from the API for a specified symbol.
+        """Get the FOREX data from the API for a specified symbol.
 
         Args:
             period (str, optional): Defines the window size for each new quote. Defaults to "daily".
@@ -127,7 +126,7 @@ class ForexExtractor(BaseExtractor):
             json_data = response[f"Time Series FX ({period})"]
 
         return json_data
-        
+
     @staticmethod
     def __return_request(url: str) -> dict:
         """_summary_
@@ -147,7 +146,7 @@ class ForexExtractor(BaseExtractor):
             if len(r_json) == 0:
                 logging.error(f"API response returned an empty dictionary")
                 raise APIError
-            
+
             potential_error_message = list(r_json.keys())[0]
             potential_error_explanation = list(r_json.values())[0]
             if potential_error_message.lower() == "error message":
@@ -157,7 +156,7 @@ class ForexExtractor(BaseExtractor):
         except requests.exceptions.RequestException:
             logging.error(f"Could not connect with AlphaVantage API. Please, "\
                            "make sure you are connected to the internet")
-    
+
         return r_json
 
 print(ForexExtractor("USD/CHF").get_data("1min", from_date="2023-08-01"))

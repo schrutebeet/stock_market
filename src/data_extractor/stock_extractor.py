@@ -141,5 +141,5 @@ class StocksExtractor(BaseExtractor):
         except requests.exceptions.RequestException:
             logging.error(f"Could not connect with AlphaVantage API. Please, "\
                            "make sure you are connected to the internet")
-    
+
         return r_json

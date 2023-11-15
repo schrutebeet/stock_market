@@ -141,7 +141,7 @@ class CryptoExtractor(BaseExtractor):
             if len(r_json) == 0:
                 logging.error(f"API response returned an empty dictionary")
                 raise APIError
-            
+
             potential_error_message = list(r_json.keys())[0]
             potential_error_explanation = list(r_json.values())[0]
             if potential_error_message.lower() == "error message":
@@ -151,5 +151,5 @@ class CryptoExtractor(BaseExtractor):
         except requests.exceptions.RequestException:
             logging.error(f"Could not connect with AlphaVantage API. Please, "\
                            "make sure you are connected to the internet")
-    
+
         return r_json
