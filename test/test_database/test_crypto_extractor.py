@@ -37,6 +37,7 @@ class TestCryptoExtractor(unittest.TestCase):
             },
         }
     }
+
     input_ethereum_5mins = \
     {
         "Time Series Crypto (5min)": {
@@ -56,6 +57,7 @@ class TestCryptoExtractor(unittest.TestCase):
             },
         }
     }
+
     expected_bitcoin_daily = pd.DataFrame(data={"open_CHF": [33441.48193380], 
                                                 "open_USD": [37064.13000000], 
                                                 "high_CHF": [33760.75565740],
@@ -69,6 +71,7 @@ class TestCryptoExtractor(unittest.TestCase):
                                                  "symbol": ["BTC"],},
                                                 index=[pd.to_datetime("2023-11-10")],
                                                 )
+
     expected_ethereum_5mins = pd.DataFrame(data={"open": [1889.90000], 
                                                  "high": [1890.50000],
                                                  "low": [1889.90000],
@@ -78,7 +81,7 @@ class TestCryptoExtractor(unittest.TestCase):
                                                  "symbol": ["ETH"],},
                                                  index=[pd.to_datetime("2023-11-09 22:40:00")],
                                                 )
-    
+
     @patch("src.data_extractor.crypto_extractor.CryptoExtractor._CryptoExtractor__return_request")
     def test_daily_extraction(self, mocked_response):
         mocked_response.return_value = self.input_bitcoin_daily
