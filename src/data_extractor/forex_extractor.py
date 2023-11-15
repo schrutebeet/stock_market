@@ -68,7 +68,7 @@ class ForexExtractor(BaseExtractor):
             )
             current_month += relativedelta(months=1)
         df = pd.DataFrame(json_rates).T
-        if period != "daily":
+        if period == "daily":
             renamed_cols = {
                 "1. open": "open",
                 "2. high": "high",
@@ -110,7 +110,14 @@ class ForexExtractor(BaseExtractor):
         Returns:
             Dict[str, str]: JSON file containing OHLCV information from the API.
         """
-        if period != "daily":
+        if period == "daily":
+            self.url = (
+                f"https://www.alphavantage.co/query?function=FX_DAILY&from_symbol={self.from_symbol}"\
+                f"&to_symbol={self.to_symbol}&apikey={self.api_key}"
+            )
+            response = self.__return_request(self.url)
+            json_data = response["Time Series FX (Daily)"]
+        else:
             self.url = (
                 f"https://www.alphavantage.co/query?function=FX_INTRADAY&from_symbol={self.from_symbol}"\
                 f"&to_symbol={self.to_symbol}&interval={period}&outputsize=full"\
@@ -118,13 +125,6 @@ class ForexExtractor(BaseExtractor):
             )
             response = self.__return_request(self.url)
             json_data = response[f"Time Series FX ({period})"]
-        else:
-            self.url = (
-                f"https://www.alphavantage.co/query?function=FX_DAILY&from_symbol={self.from_symbol}"\
-                f"&to_symbol={self.to_symbol}&apikey={self.api_key}"
-            )
-            response = self.__return_request(self.url)
-            json_data = response["Time Series FX (Daily)"]
 
         return json_data
         

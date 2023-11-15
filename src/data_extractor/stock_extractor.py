@@ -18,6 +18,7 @@ class StocksExtractor(BaseExtractor):
     def __init__(self, symbol: str, api_key: Any):
         super().__init__(api_key)
         self.symbol = symbol
+        self.url = None
 
     def get_data(self, 
                  period: str = "daily", 
@@ -47,23 +48,30 @@ class StocksExtractor(BaseExtractor):
                                             {', '.join(self.ACCEPTABLE_PERIODS)}"
             )
 
-        json_list = []
+        json_rates = {}
         current_month = datetime.strptime(from_date, "%Y-%m-%d")
         while current_month <= datetime.strptime(until_date, "%Y-%m-%d"):
             month_str = current_month.strftime("%Y-%m")
             new_data = self.__choose_function_type(period, month_str)
-            json_list.append(new_data)
+            json_rates.update(new_data)
             logging.info(
                 f"Extracting stock information for {month_str}"
             )
             current_month += relativedelta(months=1)
-        joining_dicts = {key: value for d in json_list for key, value in d.items()}
-        df = pd.DataFrame(joining_dicts).T
-        if period != "daily":
-            df.columns = ["open", "high", "low", "close", "volume"]
-        else:
+        df = pd.DataFrame(json_rates).T
+        if period == "daily":
             df.columns = ["open","high", "low", "close", "adj_close", 
                           "volume", "dividend_amount", "split_coeff"]
+        else:
+            renamed_cols = {
+                "1. open": "open",
+                "2. high": "high",
+                "3. low": "low",
+                "4. close": "close",
+                "5. volume": "volume",
+            }
+            df = df.rename(columns=renamed_cols)
+            df['currency'] = self.currency
         df.index = pd.to_datetime(df.index)
 
         # Apply specific daydate filters
@@ -84,19 +92,19 @@ class StocksExtractor(BaseExtractor):
         Returns:
             Dict[str, str]: JSON file containing OHLCV information from the API.
         """
-        if period != "daily":
-            url = (
-                f"https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol="
-                f"{self.symbol}&outputsize=full&month={month}&interval={period}&apikey={self.api_key}"
-            )
-            r = requests.get(url)
-            json_data = r.json()[f"Time Series ({period})"]
-        else:
-            url = (
+        if period == "daily":
+            self.url = (
                 f"https://www.alphavantage.co/query?function=TIME_SERIES_DAILY_ADJUSTED&symbol="
                 f"{self.symbol}&outputsize=full&apikey={self.api_key}"
             )
-            r = requests.get(url)
+            r = requests.get(self.url)
             json_data = r.json()["Time Series (Daily)"]
+        else:
+            self.url = (
+                f"https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol="
+                f"{self.symbol}&outputsize=full&month={month}&interval={period}&apikey={self.api_key}"
+            )
+            r = requests.get(self.url)
+            json_data = r.json()[f"Time Series ({period})"]
 
         return json_data

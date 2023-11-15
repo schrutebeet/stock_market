@@ -55,21 +55,11 @@ class CryptoExtractor(BaseExtractor):
             new_data = self.__choose_function_type(period, month_str)
             json_rates.update(new_data)
             logging.info(
-                f"Extracting stock information for {month_str}"
+                f"Extracting crypto information for {month_str}"
             )
             current_month += relativedelta(months=1)
         df = pd.DataFrame(json_rates).T
-        if period != "daily":
-            renamed_cols = {
-                "1. open": "open",
-                "2. high": "high",
-                "3. low": "low",
-                "4. close": "close",
-                "5. volume": "volume",
-            }
-            df = df.rename(columns=renamed_cols)
-            df['currency'] = self.currency
-        else:
+        if period == "daily":
             renamed_cols = {
                 f"1a. open ({self.currency})": f"open_{self.currency}",
                 "1b. open (USD)": "open_USD",
@@ -83,6 +73,16 @@ class CryptoExtractor(BaseExtractor):
                 f"6. market cap (USD)": f"market_cap_USD",
             }
             df = df.rename(columns=renamed_cols)
+        else:
+            renamed_cols = {
+                "1. open": "open",
+                "2. high": "high",
+                "3. low": "low",
+                "4. close": "close",
+                "5. volume": "volume",
+            }
+            df = df.rename(columns=renamed_cols)
+            df['currency'] = self.currency
         df.index = pd.to_datetime(df.index)
 
         # Apply specific daydate filters
@@ -106,7 +106,14 @@ class CryptoExtractor(BaseExtractor):
         Returns:
             Dict[str, str]: JSON file containing OHLCV information from the API.
         """
-        if period != "daily":
+        if period == "daily":
+            self.url = (
+                f"https://www.alphavantage.co/query?function=DIGITAL_CURRENCY_DAILY&symbol="\
+                f"{self.symbol}&market={self.currency}&apikey={self.api_key}"
+            )
+            response = self.__return_request(self.url)
+            json_data = response["Time Series (Digital Currency Daily)"]
+        else:
             self.url = (
                 f"https://www.alphavantage.co/query?function=CRYPTO_INTRADAY&symbol="\
                 f"{self.symbol}&market={self.currency}&interval={period}&outputsize=full"\
@@ -114,13 +121,6 @@ class CryptoExtractor(BaseExtractor):
             )
             response = self.__return_request(self.url)
             json_data = response[f"Time Series Crypto ({period})"]
-        else:
-            self.url = (
-                f"https://www.alphavantage.co/query?function=DIGITAL_CURRENCY_DAILY&symbol="\
-                f"{self.symbol}&market={self.currency}&apikey={self.api_key}"
-            )
-            response = self.__return_request(self.url)
-            json_data = response["Time Series (Digital Currency Daily)"]
 
         return json_data
         
