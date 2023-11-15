@@ -48,17 +48,8 @@ class CryptoExtractor(BaseExtractor):
                                             f"{', '.join(self.ACCEPTABLE_PERIODS)}")
             raise ValueOutOfBoundsException
 
-        json_rates = {}
-        current_month = datetime.strptime(from_date, "%Y-%m-%d")
-        while current_month <= datetime.strptime(until_date, "%Y-%m-%d"):
-            month_str = current_month.strftime("%Y-%m")
-            new_data = self.__choose_function_type(period, month_str)
-            json_rates.update(new_data)
-            logging.info(
-                f"Extracting crypto information for {month_str}"
-            )
-            current_month += relativedelta(months=1)
-        df = pd.DataFrame(json_rates).T
+        new_data = self.__choose_function_type(period)
+        df = pd.DataFrame(new_data).T
         if period == "daily":
             renamed_cols = {
                 f"1a. open ({self.currency})": f"open_{self.currency}",
