@@ -149,5 +149,3 @@ class ForexExtractor(BaseExtractor):
                            "make sure you are connected to the internet")
 
         return r_json
-
-print(ForexExtractor("USD/CHF").get_data("1min", from_date="2023-08-01"))
