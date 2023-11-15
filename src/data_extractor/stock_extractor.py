@@ -7,7 +7,7 @@ import requests
 from dateutil.relativedelta import relativedelta
 
 from src.data_extractor.base_extractor import BaseExtractor
-from utils.error_handling import ValueOutOfBoundsException
+from utils.error_handling import ValueOutOfBoundsException, APIError
 
 
 class StocksExtractor(BaseExtractor):
