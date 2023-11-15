@@ -6,10 +6,6 @@ from src.data_extractor.crypto_extractor import CryptoExtractor
 
 class TestCryptoExtractor(unittest.TestCase):
 
-    endpoint_bitcoin_daily = "https://www.alphavantage.co/query?function=DIGITAL_CURRENCY_DAILY&symbol="\
-                             "BTC&market=CNY&apikey=mock_key"
-    endpoint_ethereum_5mins = "https://www.alphavantage.co/query?function=CRYPTO_INTRADAY&symbol=ETH&market=EUR&"\
-                              "interval=5min}&outputsize=full&apikey=mock_key"
     input_bitcoin_daily = \
     {
         "Time Series (Digital Currency Daily)": {
