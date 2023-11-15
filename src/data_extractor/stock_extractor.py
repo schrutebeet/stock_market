@@ -78,6 +78,9 @@ class StocksExtractor(BaseExtractor):
         start_date = pd.to_datetime(f"{from_date} 00:00:00")
         end_date = pd.to_datetime(f"{until_date} 23:59:59")
         df = df[(df.index >= start_date) & (df.index <= end_date)]
+        df = df.apply(pd.to_numeric, errors='ignore')
+        df = df.fillna(method="ffill")
+        df['symbol'] = self.symbol
 
         return df
 
@@ -97,14 +100,46 @@ class StocksExtractor(BaseExtractor):
                 f"https://www.alphavantage.co/query?function=TIME_SERIES_DAILY_ADJUSTED&symbol="
                 f"{self.symbol}&outputsize=full&apikey={self.api_key}"
             )
-            r = requests.get(self.url)
-            json_data = r.json()["Time Series (Daily)"]
+            response = self.__return_request(self.url)
+            json_data = response["Time Series (Daily)"]
         else:
             self.url = (
                 f"https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol="
                 f"{self.symbol}&outputsize=full&month={month}&interval={period}&apikey={self.api_key}"
             )
-            r = requests.get(self.url)
-            json_data = r.json()[f"Time Series ({period})"]
+            response = self.__return_request(self.url)
+            json_data = response[f"Time Series ({period})"]
 
         return json_data
+
+    @staticmethod
+    def __return_request(url: str) -> dict:
+        """_summary_
+
+        Args:
+            url (str): Endpoint url for the API call.
+
+        Raises:
+            APIError: Raise custom error if any problem arises within the API. 
+
+        Returns:
+            dict: Returns a dictionary with the stated characteristics.
+        """
+        try:
+            r = requests.get(url)
+            r_json = r.json()
+            if len(r_json) == 0:
+                logging.error(f"API response returned an empty dictionary")
+                raise APIError
+            
+            potential_error_message = list(r_json.keys())[0]
+            potential_error_explanation = list(r_json.values())[0]
+            if potential_error_message.lower() == "error message":
+                logging.error(f"{potential_error_explanation}")
+                raise APIError
+
+        except requests.exceptions.RequestException:
+            logging.error(f"Could not connect with AlphaVantage API. Please, "\
+                           "make sure you are connected to the internet")
+    
+        return r_json
