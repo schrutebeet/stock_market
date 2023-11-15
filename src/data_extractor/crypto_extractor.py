@@ -48,7 +48,6 @@ class CryptoExtractor(BaseExtractor):
             raise ValueOutOfBoundsException
 
         json_rates = {}
-        current_date = datetime.now()
         current_month = datetime.strptime(from_date, "%Y-%m-%d")
         while current_month <= datetime.strptime(until_date, "%Y-%m-%d"):
             month_str = current_month.strftime("%Y-%m")
