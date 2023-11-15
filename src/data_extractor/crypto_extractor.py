@@ -95,13 +95,11 @@ class CryptoExtractor(BaseExtractor):
 
         return df
 
-    def __choose_function_type(self, period: str, month: str) -> Dict[str, str]:
+    def __choose_function_type(self, period: str) -> Dict[str, str]:
         """Decide wich endpoint to trigger depending on the period category.
 
         Args:
             period (str): Defines the window size for each new quote. Defaults to "daily".
-            month (str, optional): Timespan of the extracted information. 
-                                   Defaults to datetime.now().strftime("%Y-%m").
 
         Returns:
             Dict[str, str]: JSON file containing OHLCV information from the API.
@@ -123,7 +121,7 @@ class CryptoExtractor(BaseExtractor):
             json_data = response[f"Time Series Crypto ({period})"]
 
         return json_data
-        
+
     @staticmethod
     def __return_request(url: str) -> dict:
         """_summary_
@@ -155,5 +153,3 @@ class CryptoExtractor(BaseExtractor):
                            "make sure you are connected to the internet")
     
         return r_json
-
-
