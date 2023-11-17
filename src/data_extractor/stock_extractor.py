@@ -10,7 +10,7 @@ from src.data_extractor.base_extractor import BaseExtractor
 from utils.error_handling import ValueOutOfBoundsException, APIError
 
 
-class StocksExtractor(BaseExtractor):
+class StockExtractor(BaseExtractor):
     """Extract stock rates from the AlphaVantage API."""
 
     ACCEPTABLE_PERIODS = ["1min", "5min", "15min", "30min", "60min", "daily"]
@@ -49,8 +49,12 @@ class StocksExtractor(BaseExtractor):
             )
 
         json_rates = {}
+        #TODO: how to mock a method inside a while loop so that it gives different results every time?
+        #TODO: after casting to datetime, take only the year and month (no day)
         current_month = datetime.strptime(from_date, "%Y-%m-%d")
-        while current_month <= datetime.strptime(until_date, "%Y-%m-%d"):
+        #TODO: after casting to datetime, take only the year and month (no day)
+        last_month = datetime.strptime(until_date, "%Y-%m-%d")
+        while current_month <= last_month:
             month_str = current_month.strftime("%Y-%m")
             new_data = self.__choose_function_type(period, month_str)
             json_rates.update(new_data)
