@@ -35,11 +35,11 @@ class TestIndustriesScraper(unittest.TestCase):
         }
     )
 
-    csv = "symbol,name,exchange,assetType,ipoDate,delistingDate,status\n"\
-          "ABCD,ABCDesigns Inc,NYSE,Stock,1999-11-18,null,Active\n"\
-          "EFGH,EpicForge Technologies,NYSE,Stock,2016-10-18,null,Active\n"\
-          "IJKL,InnoJolt Labs,NYSE ARCA,ETF,2020-09-09,null,Active\n"\
-          "MNOP,MegaNova Organic Products Corp,BATS,ETF,2018-08-15,null,Active\n"
+    csv_alpha_stocks = "symbol,name,exchange,assetType,ipoDate,delistingDate,status\n"\
+                       "ABCD,ABCDesigns Inc,NYSE,Stock,1999-11-18,null,Active\n"\
+                       "EFGH,EpicForge Technologies,NYSE,Stock,2016-10-18,null,Active\n"\
+                       "IJKL,InnoJolt Labs,NYSE ARCA,ETF,2020-09-09,null,Active\n"\
+                       "MNOP,MegaNova Organic Products Corp,BATS,ETF,2018-08-15,null,Active\n"
 
     expected_alpha_stocks = pd.DataFrame(
         {
@@ -73,7 +73,7 @@ class TestIndustriesScraper(unittest.TestCase):
     @patch("requests.Session.get")
     def test_alpha_stocks(self, mocked_requests):
         s = mocked_requests.return_value
-        s.content.decode.return_value = self.csv
+        s.content.decode.return_value = self.csv_alpha_stocks
         self.industry_instance.alpha_stocks()
         output = self.industry_instance.alpha_data
         assert_frame_equal(output, self.expected_alpha_stocks)
