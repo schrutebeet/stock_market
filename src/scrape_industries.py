@@ -131,9 +131,9 @@ class IndustriesScraper:
                     break
                 else:
                     logging.error(f"Scraped zero pages. Check on the selenium code and update if necessary.")
-                    return None
+                    break
         web_data = pd.DataFrame(info)
-        web_data['timestamp'] = datetime.datetime.utcnow()
+        web_data['timestamp'] = pd.to_datetime(datetime.datetime.utcnow())
         self.web_data = web_data
         driver.quit()
 
@@ -235,4 +235,4 @@ class IndustriesScraper:
 EXECUTION
 """
 if __name__ == "__main__":
-    table = IndustriesScraper("https://stockanalysis.com/stocks/").run_scraper()
+    table = IndustriesScraper("https://stockanalysis.com/stocks/").alpha_stocks()
