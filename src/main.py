@@ -15,7 +15,7 @@ class Runner:
         logging.info(f"Initializing web scraper")
         ind_scraper = IndustriesScraper("https://stockanalysis.com/stocks/")
         scraped_tb = ind_scraper.run_scraper()
-        for symbol in scraped_tb.symbol[:2]:
+        for symbol in scraped_tb.symbol[:]:
             try:
                 stock = Stock(symbol)
                 getattr(stock, fetch_type)()
