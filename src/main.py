@@ -12,7 +12,7 @@ class Runner:
     @timeit
     def run(fetch_type="fetch_daily", train_size=0.8, rolling_window=60, scale=True):
         log_config.add_separator()
-        logging.info(f"Initializing web scraper")
+        logging.info(f"Initializing information scraping.")
         ind_scraper = IndustriesScraper("https://stockanalysis.com/stocks/")
         scraped_tb = ind_scraper.run_scraper()
         for symbol in scraped_tb.symbol[:]:
