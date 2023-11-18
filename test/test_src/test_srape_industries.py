@@ -14,10 +14,10 @@ class TestIndustriesScraper(unittest.TestCase):
                 <table>
                 <tbody>
                     <tr>
-                    <td>Symbol1</td>
-                    <td>Company1</td>
-                    <td>Industry1</td>
-                    <td>MarketCap1</td>
+                    <td>ABCD</td>
+                    <td>ABCDesigns Inc</td>
+                    <td>Technology</td>
+                    <td>3.8B</td>
                     </tr>
                 </tbody>
                 </table>
@@ -27,10 +27,10 @@ class TestIndustriesScraper(unittest.TestCase):
 
     expected_extraction = pd.DataFrame(
         {
-            "symbol": ["Symbol1"],
-            "company": ["Company1"],
-            "industry": ["Industry1"],
-            "marketcap": ["MarketCap1"],
+            "symbol": ["ABCD"],
+            "company": ["ABCDesigns Inc"],
+            "industry": ["Technology"],
+            "marketcap": ["3.8B"],
             "timestamp": [pd.to_datetime("2023-11-17")],
         }
     )
