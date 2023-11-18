@@ -23,7 +23,6 @@ class Runner:
                 base_for_model = Model(stock)
                 accuracy = base_for_model.lstm_nn(viz=False)
                 logging.info(f"Successfully run framework for symbol {symbol}. Score: {accuracy*100:.2f}%")
-                log_config.add_separator()
             except Exception as e:
                 logging.error(f"Process aborted for symbol {symbol}")
                 log_config.add_separator()
