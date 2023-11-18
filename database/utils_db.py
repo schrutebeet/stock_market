@@ -34,6 +34,3 @@ class UtilsDB:
             if cls.__tablename__ == table_name:
                 objective_cls = cls
         return objective_cls
-
-
-UtilsDB().create_new_models()
