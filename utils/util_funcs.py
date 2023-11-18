@@ -9,3 +9,17 @@ def read_json(json_path: str) -> dict:
         # Return as dictionary
         parsed_json = json.loads(file_contents)
     return parsed_json
+
+def timeit(func):
+    @staticmethod
+    def wrapper(*args, **kwargs):
+        start = time.time()
+        # runs the function
+        function = func(*args, **kwargs)
+        end = time.time()
+        print("\n", "-" * 30, sep="")
+        print(f"Elapsed time: {(end - start):.2f} seconds")
+        print("-" * 30, "\n")
+        return function
+
+    return wrapper

@@ -6,22 +6,7 @@ import utils.log_config as log_config
 from src.models import Model
 from src.scrape_industries import IndustriesScraper
 from src.stock import Stock
-
-
-def timeit(func):
-    @staticmethod
-    def wrapper(*args, **kwargs):
-        start = time.time()
-        # runs the function
-        function = func(*args, **kwargs)
-        end = time.time()
-        print("\n", "-" * 30, sep="")
-        print(f"Elapsed time: {(end - start):.2f} seconds")
-        print("-" * 30, "\n")
-        return function
-
-    return wrapper
-
+from utils.util_funcs import timeit
 
 class Runner:
     @timeit
