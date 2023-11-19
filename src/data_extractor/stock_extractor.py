@@ -55,7 +55,7 @@ class StockExtractor(BaseExtractor):
             new_data = self.__choose_function_type(period, month_str)
             json_rates.update(new_data)
             logging.info(
-                f"Extracting information for month {month_str}"
+                f"{self.symbol}: Extracting information for month {month_str}"
             )
             current_month += relativedelta(months=1)
         df = pd.DataFrame(json_rates).T
