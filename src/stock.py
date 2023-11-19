@@ -180,7 +180,3 @@ class Stock(StockExtractor):
         self.y_train = y_train
         self.x_test = x_test
         self.y_test = y_test
-
-aapl = Stock("AAPL")
-aapl_extr = aapl.extractor
-print(aapl_extr.get_data(from_date="2023-11-17", until_date="2023-11-17"))
