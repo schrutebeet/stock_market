@@ -12,12 +12,14 @@ from sklearn.preprocessing import MinMaxScaler
 
 import utils.error_handling as errors
 from dependencies.authenticator import api_key
+from src.data_extractor.stock_extractor import StockExtractor
 
 
-class Stock:
+class Stock(StockExtractor):
     def __init__(self, stock_symbol):
         self.stock_symbol = stock_symbol
         self.api_key = api_key
+        self.extractor = StockExtractor(self.stock_symbol)
         self.data = pd.DataFrame()
 
     @staticmethod
@@ -178,3 +180,7 @@ class Stock:
         self.y_train = y_train
         self.x_test = x_test
         self.y_test = y_test
+
+aapl = Stock("AAPL")
+aapl_extr = aapl.extractor
+print(aapl_extr.get_data(from_date="2023-11-17", until_date="2023-11-17"))
