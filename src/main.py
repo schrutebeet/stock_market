@@ -34,15 +34,18 @@ class Runner:
                 model_minute = utils_db.create_specific_model(class_name=symbol+"1min", model_name=symbol.lower()+"_1min", 
                                                               schema_name="stock_quotes", column_data=copy.deepcopy(default_minutes))
                 # Store daily data in DB
-                utils_db.insert_df_in_db(daily_data, model_daily)
+                if not daily_data.empty:
+                    utils_db.insert_df_in_db(daily_data, model_daily)
                 # Store minute data in DB
-                utils_db.insert_df_in_db(minute_data, model_minute)
+                if not minute_data.empty:
+                    utils_db.insert_df_in_db(minute_data, model_minute)
 
                 # getattr(stock, fetch_type)()
                 # stock.prepare_train_test_sets(train_size, rolling_window, scale=scale)
                 # base_for_model = Model(stock)
                 # accuracy = base_for_model.lstm_nn(viz=False)
                 # logging.info(f"Successfully run framework for symbol {symbol}. Score: {accuracy*100:.2f}%")
+                log_config.add_separator()
             except Exception as e:
                 logging.error(f"Process aborted for symbol {symbol}")
                 log_config.add_separator()
