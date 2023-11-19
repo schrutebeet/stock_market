@@ -61,8 +61,17 @@ class StockExtractor(BaseExtractor):
             current_month += relativedelta(months=1)
         df = pd.DataFrame(json_rates).T
         if period == "daily":
-            df.columns = ["open", "high", "low", "close", "adj_close", 
-                          "volume", "dividend_amount", "split_coeff"]
+            renamed_cols = {
+                "1. open": "open",
+                "2. high": "high",
+                "3. low": "low",
+                "4. close": "close",
+                "5. adjusted close": "adj_close",
+                "6. volume": "volume",
+                "7. dividend amount": "dividend_amount",
+                "8. split coefficient": "split_coeff",
+            }
+            df = df.rename(columns=renamed_cols)
         else:
             renamed_cols = {
                 "1. open": "open",
