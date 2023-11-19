@@ -41,16 +41,16 @@ class StockMerge(Base):
     industry = Column(Text)
     marketcap = Column(String)
 
-def create_dynamic_model(class_name, schema_name, column_data):
+def create_dynamic_model(class_name, model_name, schema_name, column_data):
     # Define the attributes for the class
     class_attributes = {
-        "__tablename__": class_name.lower(),
+        "__tablename__": model_name,
         "__table_args__": {'schema': schema_name}
     }
 
     # Add columns to the class attributes
     for column_name, column_type in column_data.items():
-        class_attributes[column_name] = Column(**column_type)
+        class_attributes[column_name] = column_type
 
     # Create the class using the type function
     dynamic_class = type(class_name, (Base,), class_attributes)
