@@ -2,12 +2,16 @@ from pathlib import Path
 import logging
 import logs
 import os
+from datetime import datetime
 
 
-log_folder = Path(__file__).parent.parent / "logs"
-os.makedirs(log_folder, exist_ok=True)
+log_path = os.environ.get('LOGS_PATH')
 
-log_file = os.path.join(log_folder, 'stock_market_logs.txt')
+current_datetime = datetime.now()
+log_file = os.path.join(log_path, f'{current_datetime.strftime("%Y_%m_%d__%H_%M_%S")}.txt')
+if not os.path.exists(log_file):
+    with open(log_file, 'w') as file:
+        file.write(f"Stock log with timestamp {current_datetime}.\n")
 
 def add_separator():
     separator = '-' * 40  # Customize the separator line as you like
