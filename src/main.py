@@ -16,17 +16,15 @@ class Runner:
         logging.info(f"Initializing information scraping.")
         # Scraping metadata on stocks (industry-type, company name, exchange market...)
         ind_scraper = IndustriesScraper("https://stockanalysis.com/stocks/")
-        #scraped_tb = ind_scraper.run_scraper()
-        scraped_tb = ind_scraper
-        scraped_tb.symbol = ["AAPL"]
+        scraped_tb = ind_scraper.run_scraper()
         for symbol in scraped_tb.symbol[:]:
             try:
                 # initiation the stock class for particular stock
                 stock = Stock(symbol)
                 # Fetching OHLCV data on that stock
                 stock_extractor = stock.extractor
-                daily_data = stock_extractor.get_data(period="daily", from_date="2023-11-17", until_date="2023-11-17")
-                minute_data = stock_extractor.get_data(period="1min", from_date="2023-11-17", until_date="2023-11-17")
+                daily_data = stock_extractor.get_data(period="daily")
+                minute_data = stock_extractor.get_data(period="1min")
                 # Saving data in DB
                 utils_db = UtilsDB()
                 # Create daily and minute tables for particular stock (if they do not exist)
@@ -40,11 +38,11 @@ class Runner:
                 # Store minute data in DB
                 utils_db.insert_df_in_db(minute_data, model_minute)
 
-                getattr(stock, fetch_type)()
-                stock.prepare_train_test_sets(train_size, rolling_window, scale=scale)
-                base_for_model = Model(stock)
-                accuracy = base_for_model.lstm_nn(viz=False)
-                logging.info(f"Successfully run framework for symbol {symbol}. Score: {accuracy*100:.2f}%")
+                # getattr(stock, fetch_type)()
+                # stock.prepare_train_test_sets(train_size, rolling_window, scale=scale)
+                # base_for_model = Model(stock)
+                # accuracy = base_for_model.lstm_nn(viz=False)
+                # logging.info(f"Successfully run framework for symbol {symbol}. Score: {accuracy*100:.2f}%")
             except Exception as e:
                 logging.error(f"Process aborted for symbol {symbol}")
                 log_config.add_separator()

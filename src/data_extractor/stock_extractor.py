@@ -1,5 +1,5 @@
 import logging
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Dict, Any
 
 import pandas as pd
@@ -22,18 +22,16 @@ class StockExtractor(BaseExtractor):
 
     def get_data(self, 
                  period: str = "daily", 
-                 from_date: str = datetime.now().strftime("%Y-%m-%d"), 
-                 until_date: str = datetime.now().strftime("%Y-%m-%d")) -> pd.DataFrame:
+                 from_date: str = (datetime.now()  - timedelta(days=1)).strftime("%Y-%m-%d"), 
+                 until_date: str =(datetime.now()  - timedelta(days=1)).strftime("%Y-%m-%d")) -> pd.DataFrame:
         """Get the stock data from the API for a specified symbol.
 
         Args:
             period (str, optional): Defines the window size for each new quote. Defaults to "daily".
-            from_date (str, optional): Date from where to start fetching data. Only accepts '%Y-m-%d'
-                                       string formats. Defaults to datetime.now().strftime("%Y-%m-%d")
-                                       (today).
-            until_date (str, optional): Date from where to end fetching data. Only accepts '%Y-m-%d'
-                                        string formats. Defaults to datetime.now().strftime("%Y-%m-%d")
-                                        (today).
+            from_date (str, optional): Date from where to start fetching data. Only accepts '%Y-m-%d' string formats. 
+                                       Defaults to datetime.now().strftime("%Y-%m-%d") - timedelta(days=1) (yesterday).
+            until_date (str, optional): Date from where to end fetching data. Only accepts '%Y-m-%d' string formats. 
+                                        Defaults to datetime.now().strftime("%Y-%m-%d") - timedelta(days=1) (yesterday).
 
         Raises:
             ValueOutOfBoundsException: Raises exception if the 'period' argument is not within the 
