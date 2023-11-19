@@ -196,14 +196,14 @@ class IndustriesScraper:
         info_wrapper = [(self.web_data, "stock_industries"), 
                         (self.alpha_data, "stock_info"), 
                         (self.joint_table, "stock_merged")]
-        # Connect to database
-        #conn = self.engine.connect()
+        # Create an instance of DB ustils
         utils = UtilsDB()
         # Check whether any new tables should be created
         utils.create_new_models()
         for tuple_ in info_wrapper:
             len_df = len(tuple_[0])
             model = utils.get_class_with_table_name(tuple_[1])
+            logging.info(f"Starting data storage in DB for table '{tuple_[1]}'.")
             if len_df > batch_size:
                 output_df = self._divide_df_in_batches(tuple_[0], batch_size)
             else:
@@ -214,6 +214,7 @@ class IndustriesScraper:
                 self.dbsession.bulk_insert_mappings(model, dictionary_rows)
             # Commit the changes to the database for each model
             self.dbsession.commit()
+            logging.info(f"Table '{tuple_[1]}' has been successfully stored in DB.")
         # Close connection
         self.dbsession.close()
 
