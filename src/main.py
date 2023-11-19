@@ -1,6 +1,4 @@
 import logging
-import sys
-import time
 
 import utils.log_config as log_config
 from src.models import Model
