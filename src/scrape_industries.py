@@ -216,6 +216,7 @@ class IndustriesScraper:
             logging.info(f"Table '{tuple_[1]}' has been successfully stored in DB.")
         # Close connection
         self.dbsession.close()
+        log_config.add_separator()
 
 
 
