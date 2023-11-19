@@ -25,7 +25,6 @@ import utils.error_handling as errors
 import utils.log_config as log_config
 from config.config import Config
 from dependencies.authenticator import api_key
-from database.connection import engine
 from database.utils_db import UtilsDB
 from database.connection import SessionLocal
 
@@ -133,7 +132,7 @@ class IndustriesScraper:
                     logging.error(f"Scraped zero pages. Check on the selenium code and update if necessary.")
                     break
         web_data = pd.DataFrame(info)
-        web_data['timestamp'] = pd.to_datetime(datetime.datetime.utcnow())
+        web_data['timestamp'] = datetime.datetime.utcnow()
         self.web_data = web_data
         driver.quit()
 
@@ -202,7 +201,7 @@ class IndustriesScraper:
         utils.create_new_models()
         for tuple_ in info_wrapper:
             len_df = len(tuple_[0])
-            model = utils.get_class_with_table_name(tuple_[1])
+            model = utils.get_model_class_with_name(tuple_[1])
             logging.info(f"Starting data storage in DB for table '{tuple_[1]}'.")
             if len_df > batch_size:
                 output_df = self._divide_df_in_batches(tuple_[0], batch_size)
@@ -218,19 +217,7 @@ class IndustriesScraper:
         # Close connection
         self.dbsession.close()
 
-    @staticmethod
-    def _divide_df_in_batches(input_df: pd.DataFrame, batch_size: int) -> Union[pd.DataFrame, List[pd.DataFrame]]:
-        """Divide dataframe in smaller pieces for speed improvement.
-        """
-        n_chunks = math.ceil(len(input_df) / batch_size)
-        output_df = []
-        starting_row, ending_row = 0, batch_size
-        for n in range(n_chunks):
-            chunked_df = input_df.iloc[starting_row : ending_row, ]
-            output_df.append(chunked_df)
-            starting_row += batch_size
-            ending_row += batch_size
-        return output_df
+
 
 """
 EXECUTION

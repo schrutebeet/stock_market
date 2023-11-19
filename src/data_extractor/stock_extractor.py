@@ -71,7 +71,6 @@ class StockExtractor(BaseExtractor):
                 "7. dividend amount": "dividend_amount",
                 "8. split coefficient": "split_coeff",
             }
-            df = df.rename(columns=renamed_cols)
         else:
             renamed_cols = {
                 "1. open": "open",
@@ -80,7 +79,7 @@ class StockExtractor(BaseExtractor):
                 "4. close": "close",
                 "5. volume": "volume",
             }
-            df = df.rename(columns=renamed_cols)
+        df = df.rename(columns=renamed_cols)
         df.index = pd.to_datetime(df.index)
 
         # Apply specific daydate filters
@@ -89,6 +88,8 @@ class StockExtractor(BaseExtractor):
         df = df[(df.index >= start_date) & (df.index <= end_date)]
         df = df.apply(pd.to_numeric, errors='ignore')
         df = df.fillna(method="ffill")
+        df['datetime'] = df.index
+        df['timestamp'] = datetime.utcnow()
         df['symbol'] = self.symbol
 
         return df
