@@ -40,6 +40,7 @@ class StockExtractor(BaseExtractor):
         Returns:
             pd.DataFrame: Returns DataFrame containing OHLCV information.
         """
+        logging.info(f"Extracting {period} stock information for {self.symbol}.")
         if period not in self.ACCEPTABLE_PERIODS:
             raise ValueOutOfBoundsException(
                 f"Argument 'period' must be one of these categories: \
@@ -54,7 +55,7 @@ class StockExtractor(BaseExtractor):
             new_data = self.__choose_function_type(period, month_str)
             json_rates.update(new_data)
             logging.info(
-                f"Extracting stock information for {month_str}"
+                f"Extracting information for month {month_str}"
             )
             current_month += relativedelta(months=1)
         df = pd.DataFrame(json_rates).T

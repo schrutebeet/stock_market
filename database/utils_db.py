@@ -39,6 +39,7 @@ class UtilsDB:
         insp = sqlalchemy.inspect(self.engine)
         if not insp.has_table(table_name=table_name, schema=schema_name):
             model_class.__table__.create(self.engine)
+        logging.info(f"Model '{model_name}' created successfully in schema '{schema_name}'.")
         return model_class
 
     def create_new_models(self) -> None:
@@ -51,6 +52,7 @@ class UtilsDB:
             schema_name = cls.__table_args__["schema"]
             if not insp.has_table(table_name=table_name, schema=schema_name):
                 cls.__table__.create(self.engine)
+                logging.info(f"Model '{table_name}' created successfully in schema '{schema_name}'.")
 
     @staticmethod
     def __get_all_classes(model_name: str) -> List[Any]:
