@@ -49,10 +49,7 @@ class StockExtractor(BaseExtractor):
             )
 
         json_rates = {}
-        #TODO: how to mock a method inside a while loop so that it gives different results every time?
-        #TODO: after casting to datetime, take only the year and month (no day)
         current_month = datetime.strptime(from_date, "%Y-%m-%d").replace(day=1)
-        #TODO: after casting to datetime, take only the year and month (no day)
         last_month = datetime.strptime(until_date, "%Y-%m-%d").replace(day=1)
         while current_month <= last_month:
             month_str = current_month.strftime("%Y-%m")
