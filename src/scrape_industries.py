@@ -20,6 +20,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.common.action_chains import ActionChains
 
 import utils.error_handling as errors
 import utils.log_config as log_config
@@ -67,7 +68,7 @@ class IndustriesScraper:
             chrome_options.binary_location = chromedriver_path
         except:
             logging.error("Incorrect ChromeDriver path. Check on the config file.")
-        chrome_options.add_argument("--headless")
+        #chrome_options.add_argument("--headless")
         try:
             driver = webdriver.Chrome(options=chrome_options)
         except selenium.common.exceptions.WebDriverException as e:
@@ -93,12 +94,14 @@ class IndustriesScraper:
             print(f"{e}")
         try:
             # Dismiss newsletter banner
-            WebDriverWait(driver, 40).until(
-                EC.element_to_be_clickable((By.CSS_SELECTOR, "[class*='Close'], [class*='close']"))
-            ).click()
+            WebDriverWait(driver, 40)
+            ActionChains(driver).move_by_offset(1, 1).click().perform()
+            # WebDriverWait(driver, 40).until(
+            #     EC.element_to_be_clickable((By.CSS_SELECTOR, "[class*='Close'], [class*='close']"))
+            # ).click()
             # in case the close driver does not work
-            element = driver.switch_to.active_element
-            element.send_keys(Keys.ESCAPE)
+            # element = driver.switch_to.active_element
+            # element.send_keys(Keys.ESCAPE)
         except Exception as e:
             logging.info("Newsletter banner was not found")
             print(f"{e}")
