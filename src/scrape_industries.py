@@ -68,7 +68,7 @@ class IndustriesScraper:
             chrome_options.binary_location = chromedriver_path
         except:
             logging.error("Incorrect ChromeDriver path. Check on the config file.")
-        #chrome_options.add_argument("--headless")
+        chrome_options.add_argument("--headless")
         try:
             driver = webdriver.Chrome(options=chrome_options)
         except selenium.common.exceptions.WebDriverException as e:
