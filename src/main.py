@@ -32,7 +32,7 @@ class Runner:
                 model_daily = utils_db.create_specific_model(class_name=symbol+"Daily", model_name=symbol.lower()+"_daily", 
                                                              schema_name="daily_quotes", column_data=copy.deepcopy(default_daily))
                 model_minute = utils_db.create_specific_model(class_name=symbol+"1min", model_name=symbol.lower()+"_1min", 
-                                                              schema_name="1min_quotes", column_data=copy.deepcopy(default_minutes))
+                                                              schema_name="onemin_quotes", column_data=copy.deepcopy(default_minutes))
                 # Store daily data in DB
                 if len(daily_data) > 0:
                     utils_db.insert_df_in_db(daily_data, model_daily)
