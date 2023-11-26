@@ -2,3 +2,4 @@ stock_venv/
 *.pyc
 __pycache__/
 .*
+drivers/
