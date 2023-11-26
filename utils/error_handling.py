@@ -25,3 +25,8 @@ class APIError(Exception):
         message = ("Successfully connected to AlphaVantage API, but an error ocurred anyway.\n"\
                    "Please, check logger for more information.")
         super().__init__(message)
+
+class DriverError(Exception):
+    def __init__(self, *args: object) -> None:
+        message = ("The webdriver is missing for this type of OS.")
+        super().__init__(*args)
