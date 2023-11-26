@@ -62,7 +62,7 @@ class IndustriesScraper:
             errors.InternetError: Raise error if no internet connection is found.
         """
         info = {"symbol": [], "company": [], "industry": [], "marketcap": []}
-        chromedriver_path = str(Path(Config.chromedriver_path))
+        chromedriver_path = str(Config().get_chrome_driver_path())
         chrome_options = webdriver.ChromeOptions()
         try:
             chrome_options.binary_location = chromedriver_path
