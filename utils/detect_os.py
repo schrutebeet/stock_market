@@ -1,7 +1,9 @@
 import platform
+import logging
 
 def detect_os():
     system_name = platform.system()
+    logging.info(f"Loaded model on {system_name} operating system.")
 
     if system_name == "Linux":
         return "linux"
