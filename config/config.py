@@ -13,7 +13,7 @@ class Config:
         if self.os == "windows":
             chromedriver_path = project_dir / Path("drivers/chrome-win64/chrome.exe")
         elif self.os == "linux":
-            chromedriver_path = project_dir / Path("drivers/chromedriver-linux64/chromedriver")
+            chromedriver_path = Path("/usr/local/bin/chromedriver")
         else:
             raise DriverError
 
