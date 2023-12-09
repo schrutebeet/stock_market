@@ -18,6 +18,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.action_chains import ActionChains
 
+import chromedriver_autoinstaller
 from utils.log_config import logger
 import utils.error_handling as errors
 import utils.log_config as log_config
@@ -64,18 +65,9 @@ class IndustriesScraper:
         chrome_options.add_argument('--headless')
         chrome_options.add_argument("--remote-debugging-port=9222")
 
-        try:
-            chrome_options.binary_location = chromedriver_path
-        except:
-            logger.error("Incorrect ChromeDriver path. Check on the config file.")
-        try:
-            driver = webdriver.Chrome(options=chrome_options)
-        except selenium.common.exceptions.WebDriverException as e:
-            logger.error(
-                f"Web scraper could not be carried out because "
-                "there is no internet connection or there is no driver installed."
-            )
-            raise errors.InternetError()
+        chromedriver_autoinstaller.install()
+        driver = webdriver.Chrome()
+        
         driver.set_window_size(1366, 768)
         driver.get(self.url)
         try:
