@@ -34,4 +34,4 @@ logger.addHandler(console_handler)
 
 def add_separator():
     separator = '-' * 40  # Customize the separator line as you like
-    logging.info(separator)
+    logger.info(separator)
