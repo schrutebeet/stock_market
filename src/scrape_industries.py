@@ -60,14 +60,13 @@ class IndustriesScraper:
             errors.InternetError: Raise error if no internet connection is found.
         """
         info = {"symbol": [], "company": [], "industry": [], "marketcap": []}
-        chromedriver_path = str(Config().get_chrome_driver_path())
         chrome_options = webdriver.ChromeOptions()
         chrome_options.add_argument('--headless')
         chrome_options.add_argument("--remote-debugging-port=9222")
 
         chromedriver_autoinstaller.install()
-        driver = webdriver.Chrome()
-        
+        driver = webdriver.Chrome(options=chrome_options)
+
         driver.set_window_size(1366, 768)
         driver.get(self.url)
         try:
