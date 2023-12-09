@@ -3,7 +3,7 @@ OBJECTIVE OF THIS MODULE
 ------------------------
 Define funtions for fetching data from AlphaVantage API
 """
-import logging
+from utils.log_config import logger 
 
 import numpy as np
 import pandas as pd
@@ -57,7 +57,7 @@ class Stock(StockExtractor):
         df = self.transform_json_to_df(json_data, start_date, end_date)
         df.columns = ["open", "high", "low", "close", "volume"]
         if df.empty:
-            logging.warning("AlphaVantage: returns an empty Dataframe.")
+            logger.warning("AlphaVantage: returns an empty Dataframe.")
             raise errors.EmptyDataframeError()
         self.data = df
 
@@ -81,12 +81,12 @@ class Stock(StockExtractor):
         try:
             r = requests.get(url)
         except requests.exceptions.ConnectionError as e:
-            logging.error(f"AlphaVantage: Could not fetch info for {self.stock_symbol} due to no internet connectivity")
+            logger.error(f"AlphaVantage: Could not fetch info for {self.stock_symbol} due to no internet connectivity")
             raise e
         try:
             json_data = r.json()["Time Series (Daily)"]
         except KeyError as e:
-            logging.warning('AlphaVantage: JSON does not have a "Time Series (Daily)" key.')
+            logger.warning('AlphaVantage: JSON does not have a "Time Series (Daily)" key.')
             raise e
         df = self.transform_json_to_df(json_data, start_date, end_date)
         df.columns = [
@@ -100,7 +100,7 @@ class Stock(StockExtractor):
             "split_coeff",
         ]
         if df.empty:
-            logging.warning("AlphaVantage: returns an empty Dataframe.")
+            logger.warning("AlphaVantage: returns an empty Dataframe.")
             raise errors.EmptyDataframeError(self.stock_symbol)
         self.data = df
 
@@ -136,17 +136,17 @@ class Stock(StockExtractor):
         self.train_size = train_size
         self.rolling_window = rolling_window
         if not 0 < train_size < 1:
-            logging.error("Argument 'train_size' must be a value between 0 and 1.")
+            logger.error("Argument 'train_size' must be a value between 0 and 1.")
             raise ValueError()
         if not rolling_window > 0:
-            logging.error("Argument 'train_size' must be higher than 0.")
+            logger.error("Argument 'train_size' must be higher than 0.")
             raise ValueError()
         df = self._treat_missing_data()
         close_prices = df["close"].to_numpy()
         # We start with the train set
         training_data_len = int(round(len(close_prices) * train_size, 0))
         if training_data_len < rolling_window:
-            logging.warning("Preprocess: training data size cannot be smaller than rolling window size.")
+            logger.warning("Preprocess: training data size cannot be smaller than rolling window size.")
             raise errors.TrainingLengthError(training_data_len, rolling_window)
         train_data = close_prices[0:training_data_len].reshape(-1, 1)
         if scale:

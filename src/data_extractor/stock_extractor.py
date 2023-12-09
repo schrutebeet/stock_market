@@ -1,4 +1,4 @@
-import logging
+from utils.log_config import logger 
 from datetime import datetime, timedelta
 from typing import Dict, Any
 
@@ -40,7 +40,7 @@ class StockExtractor(BaseExtractor):
         Returns:
             pd.DataFrame: Returns DataFrame containing OHLCV information.
         """
-        logging.info(f"Extracting {period} stock information for {self.symbol}.")
+        logger.info(f"Extracting {period} stock information for {self.symbol}.")
         if period not in self.ACCEPTABLE_PERIODS:
             raise ValueOutOfBoundsException(
                 f"Argument 'period' must be one of these categories: \
@@ -54,7 +54,7 @@ class StockExtractor(BaseExtractor):
             month_str = current_month.strftime("%Y-%m")
             new_data = self.__choose_function_type(period, month_str)
             json_rates.update(new_data)
-            logging.info(
+            logger.info(
                 f"{self.symbol}: Extracting information for month {month_str}"
             )
             current_month += relativedelta(months=1)
@@ -138,17 +138,17 @@ class StockExtractor(BaseExtractor):
             r = requests.get(url)
             r_json = r.json()
             if len(r_json) == 0:
-                logging.error(f"API response returned an empty dictionary")
+                logger.error(f"API response returned an empty dictionary")
                 raise APIError
             
             potential_error_message = list(r_json.keys())[0]
             potential_error_explanation = list(r_json.values())[0]
             if potential_error_message.lower() == "error message":
-                logging.error(f"{potential_error_explanation}")
+                logger.error(f"{potential_error_explanation}")
                 raise APIError
 
         except requests.exceptions.RequestException:
-            logging.error(f"Could not connect with AlphaVantage API. Please, "\
+            logger.error(f"Could not connect with AlphaVantage API. Please, "\
                            "make sure you are connected to the internet")
 
         return r_json

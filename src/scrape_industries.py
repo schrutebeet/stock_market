@@ -4,14 +4,10 @@ PACKAGES
 import csv
 import datetime
 import io
-import logging
 import random
 import time
-from typing import List, Union
-from pathlib import Path
 
 import pandas as pd
-import math
 import requests
 import selenium
 from bs4 import BeautifulSoup
@@ -22,6 +18,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.action_chains import ActionChains
 
+from utils.log_config import logger
 import utils.error_handling as errors
 import utils.log_config as log_config
 from config.config import Config
@@ -70,11 +67,11 @@ class IndustriesScraper:
         try:
             chrome_options.binary_location = chromedriver_path
         except:
-            logging.error("Incorrect ChromeDriver path. Check on the config file.")
+            logger.error("Incorrect ChromeDriver path. Check on the config file.")
         try:
             driver = webdriver.Chrome(options=chrome_options)
         except selenium.common.exceptions.WebDriverException as e:
-            logging.error(
+            logger.error(
                 f"Web scraper could not be carried out because "
                 "there is no internet connection or there is no driver installed."
             )
@@ -92,7 +89,7 @@ class IndustriesScraper:
                 )
             ).click()
         except Exception as e:
-            logging.info("Cookies banner was not found")
+            logger.info("Cookies banner was not found")
             print(f"{e}")
         try:
             # Dismiss newsletter banner
@@ -105,7 +102,7 @@ class IndustriesScraper:
             # element = driver.switch_to.active_element
             # element.send_keys(Keys.ESCAPE)
         except Exception as e:
-            logging.info("Newsletter banner was not found")
+            logger.info("Newsletter banner was not found")
             print(f"{e}")
 
         # Proceed with scraping
@@ -130,11 +127,11 @@ class IndustriesScraper:
                 num_pages += 1
             except selenium.common.exceptions.TimeoutException as e:
                 if num_pages > 0:
-                    logging.info(f"Successfully web-scraped {num_pages} pages and saved {len(info['symbol'])} symbols.")
+                    logger.info(f"Successfully web-scraped {num_pages} pages and saved {len(info['symbol'])} symbols.")
                     log_config.add_separator()
                     break
                 else:
-                    logging.error(f"Scraped zero pages. Check on the selenium code and update if necessary.")
+                    logger.error(f"Scraped zero pages. Check on the selenium code and update if necessary.")
                     break
         web_data = pd.DataFrame(info)
         web_data['timestamp'] = datetime.datetime.utcnow()
@@ -207,7 +204,7 @@ class IndustriesScraper:
         for tuple_ in info_wrapper:
             len_df = len(tuple_[0])
             model = utils.get_model_class_with_name(tuple_[1])
-            logging.info(f"Starting data storage in DB for table '{tuple_[1]}'.")
+            logger.info(f"Starting data storage in DB for table '{tuple_[1]}'.")
             if len_df > batch_size:
                 output_df = self._divide_df_in_batches(tuple_[0], batch_size)
             else:
@@ -218,7 +215,7 @@ class IndustriesScraper:
                 self.dbsession.bulk_insert_mappings(model, dictionary_rows)
             # Commit the changes to the database for each model
             self.dbsession.commit()
-            logging.info(f"Table '{tuple_[1]}' has been successfully stored in DB.")
+            logger.info(f"Table '{tuple_[1]}' has been successfully stored in DB.")
         # Close connection
         self.dbsession.close()
         log_config.add_separator()

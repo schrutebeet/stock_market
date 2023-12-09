@@ -14,6 +14,8 @@ class Config:
             chromedriver_path = project_dir / Path("drivers/chrome-win64/chrome.exe")
         elif self.os == "linux":
             chromedriver_path = Path("/usr/local/bin/chromedriver")
+        elif self.os == "macos":
+            chromedriver_path = Path("/Users/ricky/opt/anaconda3/lib/python3.9/site-packages/chromedriver_autoinstaller/120/chromedriver")
         else:
             raise DriverError
 

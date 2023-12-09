@@ -2,7 +2,7 @@ import sys
 import yaml
 from pathlib import Path
 
-key_dir = Path(__file__).parent.parent / "keys"
+key_dir = Path(__file__).parent.parent.parent / "keys"
 sys.path.append(str(key_dir))
 
 from alpha_key import api_key

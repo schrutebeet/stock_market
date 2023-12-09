@@ -1,6 +1,6 @@
 import inspect
 from typing import List, Any, Union
-import logging
+from utils.log_config import logger 
 import math
 
 import sqlalchemy 
@@ -39,7 +39,7 @@ class UtilsDB:
         insp = sqlalchemy.inspect(self.engine)
         if not insp.has_table(table_name=table_name, schema=schema_name):
             model_class.__table__.create(self.engine)
-            logging.info(f"Model '{model_name}' created successfully in schema '{schema_name}'.")
+            logger.info(f"Model '{model_name}' created successfully in schema '{schema_name}'.")
         return model_class
 
     def create_new_models(self) -> None:
@@ -52,7 +52,7 @@ class UtilsDB:
             schema_name = cls.__table_args__["schema"]
             if not insp.has_table(table_name=table_name, schema=schema_name):
                 cls.__table__.create(self.engine)
-                logging.info(f"Model '{table_name}' created successfully in schema '{schema_name}'.")
+                logger.info(f"Model '{table_name}' created successfully in schema '{schema_name}'.")
 
     @staticmethod
     def __get_all_classes(model_name: str) -> List[Any]:
@@ -79,14 +79,14 @@ class UtilsDB:
             batch_size (int, optional): Maximum rows to be inserted into the DB per iteration. Defaults to 100_000.
         """
         batched_dfs = self._divide_df_in_batches(df, batch_size)
-        logging.info(f"Starting data storage in DB for table '{model.__tablename__}'.")
+        logger.info(f"Starting data storage in DB for table '{model.__tablename__}'.")
         for df_ in batched_dfs:
             # argument "orient='records'" especifies the dictionary should be made row-wise
             dictionary_rows = df_.to_dict(orient='records')
             self.dbsession.bulk_insert_mappings(model, dictionary_rows)
         # Commit the changes to the database for each model
         self.dbsession.commit()
-        logging.info(f"Table '{model.__tablename__}' has been successfully stored in DB.")
+        logger.info(f"Table '{model.__tablename__}' has been successfully stored in DB.")
         # Close connection
         self.dbsession.close()
 
