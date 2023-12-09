@@ -6,7 +6,9 @@ key_dir = Path(__file__).parent.parent.parent / "keys"
 sys.path.append(str(key_dir))
 
 from alpha_key import api_key
+import mail_key 
 api_key = api_key
+mail_key = mail_key
 
 with open(key_dir / "postgres_keys.yaml", 'r') as f:
             credentials = yaml.safe_load(f)
