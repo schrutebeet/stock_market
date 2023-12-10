@@ -13,14 +13,12 @@ import selenium
 from bs4 import BeautifulSoup
 from selenium import webdriver
 from selenium.webdriver.common.by import By
-from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.action_chains import ActionChains
 
 import chromedriver_autoinstaller
 from utils.log_config import logger
-import utils.error_handling as errors
 import utils.log_config as log_config
 from dependencies.authenticator import api_key
 from database.utils_db import UtilsDB
@@ -54,9 +52,6 @@ class IndustriesScraper:
 
     def extraction(self) -> None:
         """Scrape information on industry and market capitalization for the vast majority of US stocks.
-
-        Raises:
-            errors.InternetError: Raise error if no internet connection is found.
         """
         info = {"symbol": [], "company": [], "industry": [], "marketcap": []}
         chrome_options = webdriver.ChromeOptions()
@@ -85,12 +80,6 @@ class IndustriesScraper:
             # Dismiss newsletter banner
             WebDriverWait(driver, 40)
             ActionChains(driver).move_by_offset(1, 1).click().perform()
-            # WebDriverWait(driver, 40).until(
-            #     EC.element_to_be_clickable((By.CSS_SELECTOR, "[class*='Close'], [class*='close']"))
-            # ).click()
-            # in case the close driver does not work
-            # element = driver.switch_to.active_element
-            # element.send_keys(Keys.ESCAPE)
         except Exception as e:
             logger.info("Newsletter banner was not found")
             print(f"{e}")
