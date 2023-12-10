@@ -22,7 +22,6 @@ import chromedriver_autoinstaller
 from utils.log_config import logger
 import utils.error_handling as errors
 import utils.log_config as log_config
-from config.config import Config
 from dependencies.authenticator import api_key
 from database.utils_db import UtilsDB
 from database.connection import SessionLocal
