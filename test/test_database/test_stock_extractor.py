@@ -2,6 +2,7 @@ import unittest
 import pandas as pd
 from unittest.mock import patch
 from pandas.testing import assert_frame_equal
+from freezegun import freeze_time
 from src.data_extractor.stock_extractor import StockExtractor
 
 class TestCryptoExtractor(unittest.TestCase):
@@ -15,7 +16,7 @@ class TestCryptoExtractor(unittest.TestCase):
                 "2. high": "0.884853",
                 "3. low": "0.790474",
                 "4. close": "0.850372",
-                "5. adjusted": "0.850372",
+                "5. adjusted close": "0.850372",
                 "6. volume": "34567",
                 "7. dividend amount": "0",
                 "8. split coefficient": "1.0",
@@ -32,7 +33,7 @@ class TestCryptoExtractor(unittest.TestCase):
                 "2. high": "0.874853",
                 "3. low": "",
                 "4. close": "0.840372",
-                "5. adjusted": "0.840372",
+                "5. adjusted close": "0.840372",
                 "6. volume": "34534",
                 "7. dividend amount": "0.8",
                 "8. split coefficient": "1.0",
@@ -70,6 +71,8 @@ class TestCryptoExtractor(unittest.TestCase):
                                                 "volume": [34567, 34534],
                                                 "dividend_amount": [0, 0.8],
                                                 "split_coeff": [1.0, 1.0],
+                                                "datetime": [pd.to_datetime("2023-11-01"), pd.to_datetime("2023-10-31")],
+                                                "timestamp": [pd.to_datetime("2023-11-17 00:00:00"), pd.to_datetime("2023-11-17 00:00:00")],
                                                 "symbol": ["TSLA", "TSLA"],},
                                                 index=[pd.to_datetime("2023-11-01"), pd.to_datetime("2023-10-31")],
                                                 )
@@ -79,10 +82,13 @@ class TestCryptoExtractor(unittest.TestCase):
                                                  "low": [18.89900],
                                                  "close": [18.90490],
                                                  "volume": [1234],
-                                                "symbol": ["AAPL"],},
+                                                 "datetime": [pd.to_datetime("2023-11-09 22:40:00")],
+                                                 "timestamp": [pd.to_datetime("2023-11-17 00:00:00")],
+                                                 "symbol": ["AAPL"],},
                                                  index=[pd.to_datetime("2023-11-09 22:40:00")],
                                                 )
 
+    @freeze_time("2023-11-17 00:00:00")
     @patch("src.data_extractor.stock_extractor.StockExtractor._StockExtractor__return_request")
     def test_daily_extraction(self, mocked_response):
         mocked_response.side_effect = self.input_TSLA_daily
@@ -90,6 +96,7 @@ class TestCryptoExtractor(unittest.TestCase):
         output = tsla_extr.get_data(period="daily", from_date='2023-10-31', until_date='2023-11-01')
         assert_frame_equal(output, self.expected_TSLA_daily)
 
+    @freeze_time("2023-11-17 00:00:00")
     @patch("src.data_extractor.stock_extractor.StockExtractor._StockExtractor__return_request")
     def test_minute_extraction(self, mocked_response):
         mocked_response.return_value = self.input_AAPL_5mins
