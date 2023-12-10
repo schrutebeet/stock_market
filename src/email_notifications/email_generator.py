@@ -40,7 +40,7 @@ class EmailGenerator:
 
 
     def send_successful_start(self, placeholders: dict = {}) -> None:
-        subject = 'Stock data fetcher - Process started successfully'
+        subject = 'Application Run Successful'
         body_path = Path(__file__).parent / "successful_start.txt"
         body = self.read_file(body_path)
         body = self.replace_placeholders(body, placeholders)

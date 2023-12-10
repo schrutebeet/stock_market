@@ -48,7 +48,7 @@
         <div class="content">
             <h2>Application Run Successful</h2>
             <p>Hello,</p>
-            <p>This is an automated notification to inform you that your application has run successfully. We are now proceeding with the information extraction of {n_stocks} stocks:</p>
+            <p>This is an automated notification to inform you that the <strong> Stock Information Extractor</strong> has started successfully. We are now proceeding with the daily and minute information extraction of {n_stocks} stocks:</p>
             <p>You will receive a notification once the extraction process is complete.</p>
             <p>Thank you for using our application!</p>
         </div>
