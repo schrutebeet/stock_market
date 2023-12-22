@@ -1,4 +1,4 @@
-from utils.log_config import logger 
+from config.log_config import logger 
 from datetime import datetime, timedelta
 from typing import Dict, Any
 

@@ -3,7 +3,7 @@ OBJECTIVE OF THIS MODULE
 ------------------------
 Define funtions for fetching data from AlphaVantage API
 """
-from utils.log_config import logger 
+from config.log_config import logger 
 
 import numpy as np
 import pandas as pd

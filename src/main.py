@@ -1,7 +1,7 @@
 import copy
 
-import utils.log_config as log_config
-from utils.log_config import logger
+import config.log_config as log_config
+from config.log_config import logger
 from src.models import Model
 from src.scrape_industries import IndustriesScraper
 from src.stock import Stock

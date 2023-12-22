@@ -1,6 +1,6 @@
 import inspect
 from typing import List, Any, Union
-from utils.log_config import logger 
+from config.log_config import logger 
 import math
 
 import sqlalchemy 

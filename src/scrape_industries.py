@@ -18,8 +18,8 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.action_chains import ActionChains
 
 import chromedriver_autoinstaller
-from utils.log_config import logger
-import utils.log_config as log_config
+from config.log_config import logger
+import config.log_config as log_config
 from dependencies.authenticator import api_key
 from database.utils_db import UtilsDB
 from database.connection import SessionLocal

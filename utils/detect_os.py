@@ -1,5 +1,5 @@
 import platform
-from utils.log_config import logger 
+from config.log_config import logger 
 
 def detect_os():
     system_name = platform.system()
