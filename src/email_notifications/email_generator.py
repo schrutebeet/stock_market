@@ -46,5 +46,10 @@ class EmailGenerator:
         body = self.replace_placeholders(body, placeholders)
         self.send_email(subject, body)
 
+    def send_successful_app_run(self, placeholders: dict = {}):
+        subject = 'All stocks saved successfully'
+        body_path = Path(__file__).parent / "successful_end.txt"
+        body = self.read_file(body_path)
+        body = self.replace_placeholders(body, placeholders)
+        self.send_email(subject, body)
 
-EmailGenerator().send_successful_start({'n_stocks': 3000})
