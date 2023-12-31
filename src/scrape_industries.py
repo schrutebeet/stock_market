@@ -47,6 +47,7 @@ class IndustriesScraper:
         self.extraction()
         self.alpha_stocks()
         self.table_unions()
+        self.joint_table = self.joint_table.dropna(subset=['symbol'])
         self.insert_tables_in_db(50_000)
         return self.joint_table
 
@@ -56,7 +57,6 @@ class IndustriesScraper:
         info = {"symbol": [], "company": [], "industry": [], "marketcap": []}
         chrome_options = webdriver.ChromeOptions()
         chrome_options.add_argument('--headless')
-        chrome_options.add_argument("--remote-debugging-port=9222")
 
         chromedriver_autoinstaller.install()
         driver = webdriver.Chrome(options=chrome_options)
@@ -81,7 +81,7 @@ class IndustriesScraper:
             WebDriverWait(driver, 40)
             ActionChains(driver).move_by_offset(1, 1).click().perform()
         except Exception as e:
-            logger.info("Newsletter banner was not found")
+            logger.debug("Newsletter banner was not found")
             print(f"{e}")
 
         # Proceed with scraping
@@ -183,7 +183,7 @@ class IndustriesScraper:
         for tuple_ in info_wrapper:
             len_df = len(tuple_[0])
             model = utils.get_model_class_with_name(tuple_[1])
-            logger.info(f"Starting data storage in DB for table '{tuple_[1]}'.")
+            logger.debug(f"Starting data storage in DB for table '{tuple_[1]}'.")
             if len_df > batch_size:
                 output_df = self._divide_df_in_batches(tuple_[0], batch_size)
             else:
