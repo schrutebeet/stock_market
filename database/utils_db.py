@@ -70,7 +70,9 @@ class UtilsDB:
                 objective_cls = cls
         return objective_cls
 
-    def insert_df_in_db(self, df: pd.DataFrame, model: object, batch_size: int = 100_000) -> None:
+    def insert_df_in_db(
+        self, df: pd.DataFrame, model: object, batch_size: int = 10_000
+    ) -> None:
         """Insert the input dataframe in the corresponding model in DB.
 
         Args:
@@ -80,15 +82,19 @@ class UtilsDB:
         """
         batched_dfs = self._divide_df_in_batches(df, batch_size)
         logger.info(f"Starting data storage in DB for table '{model.__tablename__}'.")
-        for df_ in batched_dfs:
-            # argument "orient='records'" especifies the dictionary should be made row-wise
-            dictionary_rows = df_.to_dict(orient='records')
-            self.dbsession.bulk_insert_mappings(model, dictionary_rows)
-        # Commit the changes to the database for each model
-        self.dbsession.commit()
-        logger.info(f"Table '{model.__tablename__}' has been successfully stored in DB.")
+        for df_batch in batched_dfs:
+            dictionary_rows = df_batch.to_dict(orient='records')
+            try:
+                self.dbsession.bulk_insert_mappings(model, dictionary_rows)
+            except sqlalchemy.exc.IntegrityError as e:
+                logger.warning(
+                    f"Duplicated primary key entries. Skipping. Error log: \n {e}"
+                )
+            except Exception as e:
+                logger.error(
+                    f"An error occurred when inserting data into database: {e}."
+                )
         # Close connection
-        self.dbsession.close()
 
     @staticmethod
     def _divide_df_in_batches(input_df: pd.DataFrame, batch_size: int) -> List[pd.DataFrame]:
