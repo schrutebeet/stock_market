@@ -81,20 +81,22 @@ class UtilsDB:
             batch_size (int, optional): Maximum rows to be inserted into the DB per iteration. Defaults to 100_000.
         """
         batched_dfs = self._divide_df_in_batches(df, batch_size)
-        logger.info(f"Starting data storage in DB for table '{model.__tablename__}'.")
         for df_batch in batched_dfs:
             dictionary_rows = df_batch.to_dict(orient='records')
             try:
                 self.dbsession.bulk_insert_mappings(model, dictionary_rows)
+                self.dbsession.commit()
+                logger.info(f"Table '{model.__tablename__}' successfully stored in schema {model.__table_args__['schema']}.")
             except sqlalchemy.exc.IntegrityError as e:
                 logger.warning(
-                    f"Duplicated primary key entries. Skipping. Error log: \n {e}"
+                    f"Duplicated primary key entries. Skipping table '{model.__tablename__}'. Error log: \n {e}"
                 )
             except Exception as e:
                 logger.error(
-                    f"An error occurred when inserting data into database: {e}."
+                    f"An error occurred when inserting table '{model.__tablename__}' into database: {e}."
                 )
         # Close connection
+                self.dbsession.close()
 
     @staticmethod
     def _divide_df_in_batches(input_df: pd.DataFrame, batch_size: int) -> List[pd.DataFrame]:
