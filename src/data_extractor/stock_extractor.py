@@ -22,8 +22,8 @@ class StockExtractor(BaseExtractor):
 
     def get_data(self, 
                  period: str = "daily", 
-                 from_date: str = (datetime.now()  - timedelta(days=1)).strftime("%Y-%m-%d"), 
-                 until_date: str =(datetime.now()  - timedelta(days=1)).strftime("%Y-%m-%d")) -> pd.DataFrame:
+                 from_date: str = (datetime.now() - timedelta(days=1)).strftime("%Y-%m-%d"), 
+                 until_date: str =(datetime.now() - timedelta(days=1)).strftime("%Y-%m-%d")) -> pd.DataFrame:
         """Get the stock data from the API for a specified symbol.
 
         Args:
