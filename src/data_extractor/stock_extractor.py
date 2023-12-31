@@ -40,7 +40,7 @@ class StockExtractor(BaseExtractor):
         Returns:
             pd.DataFrame: Returns DataFrame containing OHLCV information.
         """
-        logger.info(f"Extracting {period} stock information for {self.symbol}.")
+        logger.debug(f"Extracting {period} stock information for {self.symbol}.")
         if period not in self.ACCEPTABLE_PERIODS:
             raise ValueOutOfBoundsException(
                 f"Argument 'period' must be one of these categories: \
@@ -53,8 +53,9 @@ class StockExtractor(BaseExtractor):
         while current_month <= last_month:
             month_str = current_month.strftime("%Y-%m")
             new_data = self.__choose_function_type(period, month_str)
-            json_rates.update(new_data)
-            logger.info(
+            if new_data:
+                json_rates.update(new_data)
+            logger.debug(
                 f"{self.symbol}: Extracting information for month {month_str}"
             )
             current_month += relativedelta(months=1)
@@ -109,20 +110,20 @@ class StockExtractor(BaseExtractor):
                 f"https://www.alphavantage.co/query?function=TIME_SERIES_DAILY_ADJUSTED&symbol="
                 f"{self.symbol}&outputsize=full&apikey={self.api_key}"
             )
-            response = self.__return_request(self.url)
-            json_data = response["Time Series (Daily)"]
+            response = self.__return_request(self.url, self.symbol)
+            json_data = response.get("Time Series (Daily)")
         else:
             self.url = (
                 f"https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol="
                 f"{self.symbol}&outputsize=full&month={month}&interval={period}&apikey={self.api_key}"
             )
-            response = self.__return_request(self.url)
-            json_data = response[f"Time Series ({period})"]
+            response = self.__return_request(self.url, self.symbol)
+            json_data = response.get(f"Time Series ({period})")
 
         return json_data
 
     @staticmethod
-    def __return_request(url: str) -> dict:
+    def __return_request(url: str, symbol: str) -> dict:
         """_summary_
 
         Args:
@@ -138,14 +139,14 @@ class StockExtractor(BaseExtractor):
             r = requests.get(url)
             r_json = r.json()
             if len(r_json) == 0:
-                logger.error(f"API response returned an empty dictionary")
-                raise APIError
+                logger.warning(f"API response returned an empty dictionary for symbol: {symbol}")
+
             
             potential_error_message = list(r_json.keys())[0]
             potential_error_explanation = list(r_json.values())[0]
             if potential_error_message.lower() == "error message":
                 logger.error(f"{potential_error_explanation}")
-                raise APIError
+                r_json = {}
 
         except requests.exceptions.RequestException:
             logger.error(f"Could not connect with AlphaVantage API. Please, "\
