@@ -4,7 +4,7 @@ from freezegun import freeze_time
 import pandas as pd
 from pandas.testing import assert_frame_equal
 from unittest.mock import patch
-from src.scrape_industries import IndustriesScraper
+from src.general_information import GeneralInformation
 
 class TestIndustriesScraper(unittest.TestCase):
 
@@ -58,14 +58,14 @@ class TestIndustriesScraper(unittest.TestCase):
 
     def setUp(self):
         mock_url = "https://www.my_mock_webpage.com"
-        self.industry_instance = IndustriesScraper(mock_url)
+        self.industry_instance = GeneralInformation(mock_url)
 
     @freeze_time("2023-11-17")
     @patch("selenium.webdriver.Chrome")
     def test_extraction(self, mocked_driver):
         driver = mocked_driver.return_value
         driver.page_source = self.html_expected_extraction
-        self.industry_instance.extraction()
+        self.industry_instance.extract_securities()
         output = self.industry_instance.web_data
         assert_frame_equal(output, self.expected_extraction)
 
