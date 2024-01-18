@@ -1,45 +1,46 @@
 from database.connection import Base
 from sqlalchemy.dialects.postgresql import TIMESTAMP
-from sqlalchemy import String, Column, Text, DateTime, Float
+from sqlalchemy import String, Column, Text, DateTime, Float, Date
 from datetime import datetime
 
 # this Item model (table) stems from the Base class and has its properties 
 # named in an object-oriented style
 
 SCHEMA = "stocks"
-    
-class StockIndustries(Base):
-    __tablename__ = "stock_industries"
-    __table_args__ = {'schema': SCHEMA}
-    timestamp = Column(TIMESTAMP(timezone=True), nullable=False, primary_key=True)
-    symbol = Column(String, nullable=False, primary_key=True)
-    company = Column(Text)
-    industry = Column(Text)
-    marketcap = Column(String)
 
-class StockInfo(Base):
-    __tablename__ = "stock_info"
+class Nasdaq(Base):
+    __tablename__ = "nasdaq_securities"
     __table_args__ = {'schema': SCHEMA}
-    timestamp = Column(TIMESTAMP(timezone=True), nullable=False, primary_key=True)
-    symbol = Column(String, nullable=False, primary_key=True)
-    name = Column(Text)
-    exchange = Column(String)
-    assettype = Column(String)
-    ipodate = Column(DateTime)
-    delistingdate = Column(DateTime)
-    status = Column(String)
+    timestamp = Column(TIMESTAMP, nullable=False)
+    source_time = Column(TIMESTAMP, nullable=False)
+    registration_date = Column(Date, nullable=False, primary_key=True)
+    symbol =  Column(String, nullable=False, primary_key=True)
+    security_name = Column(String)
+    market_category = Column(String)
+    test_issue = Column(String)
+    financial_status = Column(String)
+    round_lot_size = Column(String)
+    is_etf = Column(String)
+    nextshares = Column(String)
+    industry = Column(String)
+    sector = Column(String)
 
-class StockMerge(Base):
-    __tablename__ = "stock_merged"
+class Other(Base):
+    __tablename__ = "other_securities"
     __table_args__ = {'schema': SCHEMA}
-    timestamp = Column(TIMESTAMP(timezone=True), nullable=False, primary_key=True)
+    timestamp = Column(TIMESTAMP, nullable=False)
+    source_time = Column(TIMESTAMP, nullable=False)
+    registration_date = Column(Date, nullable=False, primary_key=True)
     symbol = Column(String, nullable=False, primary_key=True)
-    companyname = Column(Text)
+    security_name = Column(String)
     exchange = Column(String)
-    status = Column(String)
-    ipodate = Column(DateTime)
-    industry = Column(Text)
-    marketcap = Column(String)
+    cqs_symbol = Column(String)
+    is_etf = Column(String)
+    round_lot_size = Column(String)
+    test_issue = Column(String)
+    nasdaq_symbol = Column(String)
+    industry = Column(String)
+    sector = Column(String)
 
 def create_dynamic_model(class_name, model_name, schema_name, column_data):
     # Define the attributes for the class
