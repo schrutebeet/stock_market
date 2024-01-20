@@ -52,7 +52,7 @@ class StockExtractor(BaseExtractor):
         return df
 
     @staticmethod
-    def calculate_date_chunks(end_date: str, lookback_period: int, chunk_size: int) -> Union[Tuple[str]]:
+    def calculate_date_chunks(end_date: str, lookback_period: int, chunk_size: int) -> Union[Tuple[str], Tuple[str]]:
         """Calculate periods of {chunk_size} days according to an end date and a lookback period.
 
         Args:
