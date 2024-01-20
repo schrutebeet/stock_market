@@ -4,7 +4,8 @@ from typing import Union, Tuple
 import pandas as pd
 import yfinance as yf
 
-from config.log_config import logger 
+from config.log_config import logger
+from utils.rename_columns import rename_yf_columns
 from src.data_extractor.base_extractor import BaseExtractor
 
 
@@ -38,8 +39,14 @@ class StockExtractor(BaseExtractor):
         df_list = []
         start_dates, end_dates = self.calculate_date_chunks(end_date, lookback_period, chunk_size)
         for start, end in zip(start_dates, end_dates):
-            aapl = yf.download(tickers=self.symbol, start=start, end=end, interval=interval)
-            df_list.append(aapl)
+            data_extracted_df = yf.download(tickers=self.symbol, start=start, end=end, interval=interval)
+            data_extracted_df = data_extracted_df.rename(columns = rename_yf_columns)
+            _time = datetime.now()
+            data_extracted_df['timestamp'] = _time
+            data_extracted_df['timestamp_day'] = _time.strftime("%Y-%m-%d")
+            data_extracted_df['datetime'] = data_extracted_df.index
+            data_extracted_df['symbol'] = self.symbol
+            df_list.append(data_extracted_df)
         df = pd.concat(df_list)
         logger.debug(f"Data on {self.symbol} with {len(df)} rows has been imported successfully.")
         return df

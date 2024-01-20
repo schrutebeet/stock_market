@@ -15,7 +15,7 @@ from utils.headers import headers
 from config.log_config import logger
 from database.utils_db import UtilsDB
 from database.models import Nasdaq, Other
-from utils.sec_columns import rename_sec_columns
+from utils.rename_columns import rename_sec_columns
 
 """
 VARIABLES
@@ -57,11 +57,13 @@ class GeneralInformation:
         list_of_dfs = []
         if 'nasdaq' in securities_filter:
             nasdaq_securities = self._call_api_for_specific_security('nasdaq', Nasdaq)
-            nasdaq_stocks = nasdaq_securities[nasdaq_securities['is_etf'] == 'N']
+            nasdaq_stocks = nasdaq_securities[nasdaq_securities['is_etf'] == 'N'].iloc[:]
+            nasdaq_stocks.metadata = nasdaq_securities.metadata
             list_of_dfs.append(nasdaq_stocks)
         if 'other' in securities_filter:
             other_securities = self._call_api_for_specific_security('other', Other)
-            other_stocks = other_securities[other_securities['is_etf'] == 'N']
+            other_stocks = other_securities[other_securities['is_etf'] == 'N'].iloc[:]
+            other_stocks.metadata = other_securities.metadata
             list_of_dfs.append(other_stocks)
         return list_of_dfs
     

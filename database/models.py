@@ -50,8 +50,8 @@ def create_dynamic_model(class_name, model_name, schema_name, column_data):
     }
 
     # Add columns to the class attributes
-    for column_name, column_type in column_data.items():
-        class_attributes[column_name] = column_type
+    for column in column_data:
+        class_attributes[column.name] = column
 
     # Create the class using the type function
     dynamic_class = type(class_name, (Base,), class_attributes)

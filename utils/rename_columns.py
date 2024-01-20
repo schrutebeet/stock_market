@@ -13,3 +13,12 @@ rename_sec_columns = {
     'ETF': 'is_etf',   # Identifies whether the security is an exchange traded fund (ETF).
     'NextShares': 'nextshares', # N/A
 }
+
+rename_yf_columns = {
+    "Open": "open",
+    "High": "high",
+    "Close": "close",
+    "Low": "low",
+    "Adj Close": "adj_close",
+    "Volume": "volume",
+}
