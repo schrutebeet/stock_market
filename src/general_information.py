@@ -1,6 +1,7 @@
 """
 PACKAGES
 """
+import random
 import requests
 import pandas as pd
 from io import StringIO
@@ -10,6 +11,7 @@ from typing import List, Any
 
 import yfinance as yf
 
+from utils.headers import headers
 from config.log_config import logger
 from database.utils_db import UtilsDB
 from database.models import Nasdaq, Other
@@ -28,7 +30,7 @@ class GeneralInformation:
     def __init__(self) -> None:
         pass
 
-    def run_extraction(self, securities_filter: List[str]) -> pd.DataFrame:
+    def run_extraction(self, securities_filter: List[str] = ['nasdaq', 'other']) -> pd.DataFrame:
         """Run all methods sequentially to get the joint results of all scrapings.
 
         Returns:
@@ -37,6 +39,9 @@ class GeneralInformation:
         """
         list_of_dfs = self.extract_securities(securities_filter = securities_filter)
         list_of_dfs_with_ind_sect = self._extract_industries_sectors(list_of_dfs)
+        self.save_tables(list_of_dfs_with_ind_sect)
+        joint_df_with_ind_sect = pd.concat(list_of_dfs_with_ind_sect)
+        return joint_df_with_ind_sect
 
     def extract_securities(self, securities_filter: List[str] = ['nasdaq', 'other']) -> List[pd.DataFrame]:
         """Fetch stock information from www.nasdaqtrader.com. Such information is divided into 
@@ -52,14 +57,15 @@ class GeneralInformation:
         list_of_dfs = []
         if 'nasdaq' in securities_filter:
             nasdaq_securities = self._call_api_for_specific_security('nasdaq', Nasdaq)
-            list_of_dfs.append(nasdaq_securities)
+            nasdaq_stocks = nasdaq_securities[nasdaq_securities['is_etf'] == 'N']
+            list_of_dfs.append(nasdaq_stocks)
         if 'other' in securities_filter:
             other_securities = self._call_api_for_specific_security('other', Other)
-            list_of_dfs.append(other_securities)
+            other_stocks = other_securities[other_securities['is_etf'] == 'N']
+            list_of_dfs.append(other_stocks)
         return list_of_dfs
     
-    @staticmethod
-    def _call_api_for_specific_security(security_group_name: str, model: Any) -> pd.DataFrame:
+    def _call_api_for_specific_security(self, security_group_name: str, model: Any) -> pd.DataFrame:
         """Request data information from the NASDAQ API. 
 
         Args:
@@ -71,7 +77,8 @@ class GeneralInformation:
         Returns:
             pd.DataFrame: API response, made dataframe.
         """
-        response = requests.get(f"http://ftp.nasdaqtrader.com/dynamic/SymDir/{security_group_name}listed.txt")
+        response = requests.get(f"http://ftp.nasdaqtrader.com/dynamic/SymDir/{security_group_name}listed.txt", 
+                                headers=random.choice(headers))
         corpus = response.text
         df = pd.read_csv(StringIO(corpus), sep="|")
         df = df.rename(columns=rename_sec_columns)
@@ -103,7 +110,7 @@ class GeneralInformation:
         """
         for sec in list_of_securities:
             industry_list, sector_list = [], []
-            for symbol in sec['symbol'][:]:
+            for symbol in sec['symbol']:
                 if sec[sec['symbol'] == symbol].iloc[0]['is_etf'] == 'N':
                     try:
                         info = yf.Ticker(symbol.replace(".", "-")).info
@@ -112,13 +119,18 @@ class GeneralInformation:
                     except requests.exceptions.HTTPError:
                         industry_list.append(None)
                         sector_list.append(None)
-                        logger.debug(f"Request returned an HTTP error.
-                                     No industry nor sector was found for {symbol}.")
+                        logger.debug(f"Request returned an HTTP error. "\
+                                     f"No industry nor sector was found for {symbol}.")
+                    except requests.exceptions.ChunkedEncodingError:
+                        industry_list.append(None)
+                        sector_list.append(None)
+                        logger.debug(f"Connection broken. "\
+                                     f"No industry nor sector was found for {symbol}.")
                 else:
                     industry_list.append(None)
                     sector_list.append(None)
-                    logger.debug(f"Symbol is an ETF.
-                                     No industry nor sector was applied for {symbol}.")
+                    logger.debug(f"Symbol is an ETF. "\
+                                f"No industry nor sector was applied for {symbol}.")
             sec['industry'] = industry_list
             sec['sector'] = sector_list
         return list_of_securities

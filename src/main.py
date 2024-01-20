@@ -1,14 +1,9 @@
 import copy
-import time
-import sys
-
 
 import config.log_config as log_config
 from config.log_config import logger
-from src.models import Model
-from src.scrape_industries import IndustriesScraper
+from src.general_information import GeneralInformation
 from src.stock import Stock
-from utils.util_funcs import timeit
 from database.utils_db import UtilsDB
 from utils.dafault_columns import default_daily, default_minutes
 from email_notifications.email_generator import EmailGenerator
@@ -16,20 +11,21 @@ from email_notifications.email_generator import EmailGenerator
 def main():
     log_config.add_separator()
     logger.info(f"Initializing information scraping.")
-    # Scraping metadata on stocks (industry-type, company name, exchange market...)
-    ind_scraper = IndustriesScraper("https://stockanalysis.com/stocks/")
-    scraped_tb = ind_scraper.run_scraper()
-    stock_dictionary = {}
+    # Call API with metadata on stocks (industry-type, company name, exchange market...)
+    # After fetching, automatically store data in DB
+    stock_df = GeneralInformation().run_extraction()
     utils_db = UtilsDB()
-    for symbol in scraped_tb.symbol[:]:
+    stock_dictionary = {}
+    for symbol in stock_df.symbol[:]:
+        logger.debug(f"Checking additional information for symbol {symbol}.")
         # initiation the stock class for particular stock
         stock_dictionary[f"{symbol}"] = Stock(symbol)
         # Fetching OHLCV data on that stock
         stock_extractor = stock_dictionary[f"{symbol}"].extractor
-        stock_dictionary[f"{symbol}_daily"] = stock_extractor.get_data(period="daily")
-        stock_dictionary[f"{symbol}_1min"] = stock_extractor.get_data(period="1min")
+        stock_dictionary[f"{symbol}_daily"] = stock_extractor.get_data(interval="1d")
+        stock_dictionary[f"{symbol}_1min"] = stock_extractor.get_data(interval="1m")
 
-    for symbol in scraped_tb.symbol[:]:
+    for symbol in stock_df.symbol[:]:
         model_daily = utils_db.create_specific_model(class_name=f"{symbol}_daily", model_name=f"{symbol}_daily", 
                                                         schema_name="daily_quotes", column_data=copy.deepcopy(default_daily))
         model_minute = utils_db.create_specific_model(class_name=f"{symbol}_1min", model_name=f"{symbol}_1min", 
@@ -61,7 +57,7 @@ def main():
             # logger.info(f"Successfully run framework for symbol {symbol}. Score: {accuracy*100:.2f}%")
     logger.info("SUCCESS: END OF PROCESS")
     email = EmailGenerator()
-    email_info =  {'recipient': 'Ricardo', 'n_stocks': len(scraped_tb.symbol)}
+    email_info =  {'recipient': 'Ricardo', 'n_stocks': len(stock_df.symbol)}
     email.send_successful_app_run(email_info)
 
 
