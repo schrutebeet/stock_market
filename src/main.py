@@ -22,8 +22,8 @@ def main():
         stock_dictionary[f"{symbol}"] = Stock(symbol)
         # Fetching OHLCV data on that stock
         stock_extractor = stock_dictionary[f"{symbol}"].extractor
-        stock_dictionary[f"{symbol}_daily"] = stock_extractor.get_data(lookback_period = 1, chunk_size = 1, interval="1d")
-        stock_dictionary[f"{symbol}_1min"] = stock_extractor.get_data(lookback_period = 1, chunk_size = 1, interval="1m")
+        stock_dictionary[f"{symbol}_daily"] = stock_extractor.get_data(lookback_period = 2, chunk_size = 2, interval="1d")
+        stock_dictionary[f"{symbol}_1min"] = stock_extractor.get_data(lookback_period = 2, chunk_size = 2, interval="1m")
 
     for symbol in stock_df.symbol[:]:
         model_daily = utils_db.create_specific_model(class_name=f"{symbol}_daily", model_name=f"{symbol}_daily", 
