@@ -21,5 +21,7 @@ Before running this project, ensure you have the following dependencies installe
 ### Clone the repository
 
 ```bash
-git clone <repository_url>
-cd <repository_directory>
+git clone git@github.com:schrutebeet/stock_market.git
+cd stock_market
+```
+
