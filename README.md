@@ -1,13 +1,13 @@
-# Stock Data Scraping and Storage :chart_with_upwards_trend:
+# Stock Data Scraping and Storage :chart_with_upwards_trend::bar_chart:
 
-This project automates the extraction of stock data from an API, processes the data, and stores it in a database. It handles both daily and minute-level stock data, performs necessary transformations, and sends a notification upon successful execution. The core of the application is written in Python, and it integrates with a database to store the stock information.
+This project automates the extraction of stock data from the [AlphaVantage API](https://www.alphavantage.co/) , processes the data, and stores it in a database of your choice. It handles several time-level (minute, daily, weekly...) stock data, performs necessary transformations, and sends a notification when successfully executed. This project has been developed using Python, and it can integrate with any PostgreSQL database (local or remote).
 
-## Features
+## Project features
 
-- **Stock Data Extraction**: Fetches metadata and stock data (OHLCV) for different stocks.
-- **Data Storage**: Stores the data in a database (supports daily and minute-level data).
-- **Email Notification**: Sends a success notification after the process is complete.
-- **Logging**: Comprehensive logging of the process, including both info and debug-level logs.
+- **Stock Data Extraction**: Fetches metadata and stock data (OHLCV) for different stocks. An Alphavantage API key is needed. Can be requested following this [link](https://www.alphavantage.co/support/#support).
+- **Data Storage**: Stores the data in a PostgreSQL database.
+- **Email Notification**: Sends a success notification after the process is complete. E-mail credentials are needed in order to enable this feature.
+- **Logging**: Comprehensive logging of the process. Can be useful both for reporting and debugging.
 
 ## Requirements
 
