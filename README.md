@@ -4,9 +4,9 @@ This project automates the extraction of stock data from the [AlphaVantage API](
 
 ## Project features
 
-- **Stock Data Extraction**: Fetches metadata and stock data (OHLCV) for different stocks. An Alphavantage API key is needed. Can be requested following this [link](https://www.alphavantage.co/support/#support).
-- **Data Storage**: Stores the data in a PostgreSQL database.
-- **Email Notification**: Sends a success notification after the process is complete. E-mail credentials are needed in order to enable this feature.
+- **Stock data extraction**: Fetches metadata and stock data (OHLCV) for different stocks. An Alphavantage API key is needed. Can be requested following this [link](https://www.alphavantage.co/support/#support).
+- **Data storage**: Stores the data in a PostgreSQL database.
+- **Email notification**: Sends a success notification after the process is complete. E-mail credentials are needed in order to enable this feature.
 - **Logging**: Comprehensive logging of the process. Can be useful both for reporting and debugging.
 
 ## Requirements
