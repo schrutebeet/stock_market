@@ -28,13 +28,13 @@ cd stock_market
 ## Additional resources
 The project also contains the following files:
 
-- `Dockefile`: A Docker file which can be used to build an image of this project and deploy it anywhere. I personally use this option to deploy the project on a Raspberry Pi 3B.
-- `stocks_cronjob.sh`: If using images is an expensive option for deploying, you can also add this file as a Cronjob task to be executed in your computer.
+- **Dockefile**: A Docker file which can be used to build an image of this project and deploy it anywhere. I personally use this option to deploy the project on a Raspberry Pi 3B.
+- **stocks_cronjob.sh**: If using images is an expensive option for deploying, you can also add this file as a Cronjob task to be executed in your computer.
 
 
 ## Planning ahead
 The next steps for this project include:
 
-- `Portfolios`: Enable portfolios to be created in the project.
-- `Dashboards`: Use Graphana or other open source libraries to build comprehensive dashboards with risk management and price predictions, given an instrument or portfolio. 
-- `Tests`: Finish unit tests for the source code and reach minimum a 90% coverage level.
+- **Portfolios**: Enable portfolios to be created in the project.
+- **Dashboards**: Use Graphana or other open source libraries to build comprehensive dashboards with risk management and price predictions, given an instrument or portfolio. 
+- **Tests**: Finish unit tests for the source code and reach minimum a 90% coverage level.
